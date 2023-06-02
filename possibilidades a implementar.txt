@@ -1,0 +1,3 @@
+tratar erro se nao houver campos nos documentos word
+selecionar todos os registos.
+preparar o/s documento/s para os vários registos selecionados

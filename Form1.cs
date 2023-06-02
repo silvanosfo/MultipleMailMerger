@@ -26,7 +26,7 @@ namespace MultipleMailMerger
             chooseDocs.Title = "Selecionar documentos a tratar";
 
             //Filtro de tipos de ficheiros a manipular
-            chooseDocs.Filter = "Microsoft Word Templates (*.dotx)|*.dotx|Microsoft Word Documents (*.docx)|*.docx";
+            chooseDocs.Filter = "MS Office Word Templates (*.dotx)|*.dotx|MS Office Word Documents (*.docx)|*.docx";
 
             //Ativa a seleção de vários ficheiros
             chooseDocs.Multiselect = true;
@@ -48,20 +48,29 @@ namespace MultipleMailMerger
                 pathsTest = "";
 
 
-
                 //Instanciação de váriavel para manipular um documento Word
                 Document document = new Document();
 
                 //Carrega o documento
                 document.LoadFromFile(chooseDocs.FileNames[0]);
 
-                //Percorrer todos os campos presentes no documento
-                //Adicioná-los a uma lista evitando repetições
-                foreach (var item in document.MailMerge.GetMergeFieldNames())
+
+                //Testar se os documentos possuem campos
+                if (document.MailMerge.GetMergeFieldNames().Count() ==  0)
                 {
-                    if (!campos.Contains(item))
+                    MessageBox.Show("Impossível continuar\n" +
+                                    "O(s) documento(s) que selecionou não integra(m) campos!");
+                }
+                else
+                {
+                    //Percorrer todos os campos presentes no documento
+                    //Adicioná-los a uma lista evitando repetições
+                    foreach (var item in document.MailMerge.GetMergeFieldNames())
                     {
-                        campos.Add(item);
+                        if (!campos.Contains(item))
+                        {
+                            campos.Add(item);
+                        }
                     }
                 }
             }
@@ -72,6 +81,22 @@ namespace MultipleMailMerger
                 pathsTest += campo + "\n";
             }
             MessageBox.Show(pathsTest);
+
+
+            DbManager dbManager = new DbManager();
+            //Criar a base de dados
+            try
+            {
+                dbManager.CriarDb();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Erro: " + ex.Message);
+            }
+
+
+            
+            dbManager.CriarTabela("Tabela", campos);
             
 
 
