@@ -1,4 +1,4 @@
-﻿namespace SimpleDataInserterIntoWordDocuments
+﻿namespace MultipleMailMerger
 {
     partial class Form1
     {

@@ -1,4 +1,4 @@
-namespace SimpleDataInserterIntoWordDocuments
+namespace MultipleMailMerger
 {
     internal static class Program
     {

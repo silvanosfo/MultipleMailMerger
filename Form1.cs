@@ -3,7 +3,7 @@ using Spire.Doc;
 using System;
 
 
-namespace SimpleDataInserterIntoWordDocuments
+namespace MultipleMailMerger
 {
     public partial class Form1 : Form
     {
