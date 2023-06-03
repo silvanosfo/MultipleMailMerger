@@ -16,7 +16,7 @@ namespace MultipleMailMerger
         public Form1()
         {
             InitializeComponent();
-            this.Text = "Simple Data Inserter Into Word Documents";
+            this.Text = "Multiple Mail Merger";
             btnChooseFiles.Text = "Selecionar documentos";
         }
 

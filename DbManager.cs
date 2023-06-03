@@ -9,26 +9,30 @@ namespace MultipleMailMerger
 {
     public class DbManager
     {
-        private static SQLiteConnection sqliteConnection;
+        private static string pasta = "Databases";
+        private static string nomeDB = "Database";
+        private static string strConn = $"Data Source={pasta}\\{nomeDB}.db;Version=3";
+        public string strSQL = "";
 
-        //Método que retorna a stringconnection usada
-        private SQLiteConnection DbConnection()
+        public void ExecutaQuery(string query)
         {
-            sqliteConnection= new SQLiteConnection("Data Source=..\\Databases\\Database.db;Version=3");
+            SQLiteConnection sqliteConnection = new SQLiteConnection(strConn);
             sqliteConnection.Open();
-            return sqliteConnection;
+            SQLiteCommand comando = new SQLiteCommand(query, sqliteConnection);
+            comando.ExecuteNonQuery();
+            sqliteConnection.Close();
         }
 
         public void CriarDb()
         {
-            if (!System.IO.Directory.Exists("..\\Databases"))
+            if (!System.IO.Directory.Exists(pasta))
             {
-                System.IO.Directory.CreateDirectory("..\\Databases");
+                System.IO.Directory.CreateDirectory(pasta);
             }
 
             try
             {
-                SQLiteConnection.CreateFile("..\\Databases\\Database.db");
+                SQLiteConnection.CreateFile($"{pasta}\\{nomeDB}.db");
             }
             catch (Exception)
             {
@@ -39,20 +43,26 @@ namespace MultipleMailMerger
 
         public void CriarTabela(string nomeTabela, List<string> campos)
         {
-            //var que vai montar os campos da tabela
-            string caracteristicas = "id int";
-            foreach (var campo in campos)
+            //var e ciclo que vai montar os campos da tabela
+            string caracteristicas = "";
+
+            for (int i = 0; i < campos.Count(); i++)
             {
-                caracteristicas += ", " + campo + " TEXT";
+                //se não é ultima iteração
+                if (i+1 < campos.Count())
+                {
+                    caracteristicas += campos[i] + " TEXT, ";
+
+                }
+                //ultima iteração, nao leva ","
+                else
+                {
+                    caracteristicas += campos[i] + " TEXT";
+                }
             }
 
-            //var do tipo command para executar comandos
-            //O QUE RAIO É USING??????
-            using (SQLiteCommand cmd = DbConnection().CreateCommand())
-            {
-                cmd.CommandText = $"CREATE TABLE IF NOT EXISTS {nomeTabela}({caracteristicas});";
-                cmd.ExecuteNonQuery();
-            }
+            strSQL = $"CREATE TABLE IF NOT EXISTS {nomeTabela}({caracteristicas});";
+            ExecutaQuery(strSQL);
         }
 
 
@@ -60,13 +70,6 @@ namespace MultipleMailMerger
          * - Método para ver todas as tabelas existentes e listar os nomes delas para uma listbox
          * 
          */
-
-
-
-
-
-
-
 
     }
 }
