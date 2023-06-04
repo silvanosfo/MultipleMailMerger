@@ -57,10 +57,10 @@ namespace MultipleMailMerger
         {
             //var e ciclo que vai montar os campos da tabela
             string caracteristicas = "";
-
-            for (int i = 0; i < campos.Count(); i++)
+            int quantCampos = campos.Count();
+            for (int i = 0; i < quantCampos; i++)
             {
-                if (i+1 < campos.Count())
+                if (i+1 < quantCampos)
                 {
                     caracteristicas += campos[i] + " TEXT, ";
 
