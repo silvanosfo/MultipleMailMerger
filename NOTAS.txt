@@ -46,3 +46,11 @@ Pode ser relevante nao usar a lista<string> de caminhos
 
 
 se o ultimo campo do documento já existe na lista LINHA 133
+
+
+#LINKS:
+https://www.youtube.com/watch?v=dOdPf6jgtPQ
+https://www.macoratti.net/17/04/cshp_sqlite1.htm
+https://www.macoratti.net/17/04/cshp_sqlite2.htm
+ler, inserir, editar, apagar registos da tabela especifica a usar nos documentos
+https://www.e-iceblue.com/Tutorials/Spire.Doc/Spire.Doc-Program-Guide/Mail-Merge/Identify-Merge-Field-Names-in-Word-with-C.html
