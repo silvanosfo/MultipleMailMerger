@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SQLite;
 using System.Linq;
 using System.Text;
@@ -11,16 +12,23 @@ namespace MultipleMailMerger
     {
         private static string pasta = "Databases";
         private static string nomeDB = "Database";
+        private static string caminhoDB = $"{pasta}\\{nomeDB}.db";
         private static string strConn = $"Data Source={pasta}\\{nomeDB}.db;Version=3";
         public string strSQL = "";
 
-        public void ExecutaQuery(string query)
+        public DataTable ExecutarQuery()
         {
             SQLiteConnection sqliteConnection = new SQLiteConnection(strConn);
             sqliteConnection.Open();
-            SQLiteCommand comando = new SQLiteCommand(query, sqliteConnection);
+            SQLiteCommand comando = new SQLiteCommand(strSQL, sqliteConnection);
             comando.ExecuteNonQuery();
+
+            SQLiteDataAdapter da = new SQLiteDataAdapter(comando);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+
             sqliteConnection.Close();
+            return dt;
         }
 
         public void CriarDb()
@@ -30,14 +38,18 @@ namespace MultipleMailMerger
                 System.IO.Directory.CreateDirectory(pasta);
             }
 
-            try
+            //Para nao substituir a bd com um ficheiro vazio
+            if (!System.IO.File.Exists(caminhoDB))
             {
-                SQLiteConnection.CreateFile($"{pasta}\\{nomeDB}.db");
-            }
-            catch (Exception)
-            {
-                //Não criou a DB por alguma razao (Faltava criar o diretório)
-                throw;
+                try
+                {
+                    SQLiteConnection.CreateFile(caminhoDB);
+                }
+                catch (Exception)
+                {
+                    //Não criou a DB por alguma razao (Faltava criar o diretório)
+                    throw;
+                }
             }
         }
 
@@ -48,28 +60,20 @@ namespace MultipleMailMerger
 
             for (int i = 0; i < campos.Count(); i++)
             {
-                //se não é ultima iteração
                 if (i+1 < campos.Count())
                 {
                     caracteristicas += campos[i] + " TEXT, ";
 
                 }
-                //ultima iteração, nao leva ","
                 else
                 {
+                    //ultima iteração, nao leva ","
                     caracteristicas += campos[i] + " TEXT";
                 }
             }
 
             strSQL = $"CREATE TABLE IF NOT EXISTS {nomeTabela}({caracteristicas});";
-            ExecutaQuery(strSQL);
+            ExecutarQuery();
         }
-
-
-        /* FALTA FAZER:
-         * - Método para ver todas as tabelas existentes e listar os nomes delas para uma listbox
-         * 
-         */
-
     }
 }

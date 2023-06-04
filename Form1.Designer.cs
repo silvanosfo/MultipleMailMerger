@@ -28,25 +28,25 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.btnChooseFiles = new System.Windows.Forms.Button();
+            this.btnEscolherDocs = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // btnChooseFiles
+            // btnEscolherDocs
             // 
-            this.btnChooseFiles.Location = new System.Drawing.Point(12, 12);
-            this.btnChooseFiles.Name = "btnChooseFiles";
-            this.btnChooseFiles.Size = new System.Drawing.Size(149, 23);
-            this.btnChooseFiles.TabIndex = 0;
-            this.btnChooseFiles.Text = "button1";
-            this.btnChooseFiles.UseVisualStyleBackColor = true;
-            this.btnChooseFiles.Click += new System.EventHandler(this.btnChooseFiles_Click);
+            this.btnEscolherDocs.Location = new System.Drawing.Point(12, 12);
+            this.btnEscolherDocs.Name = "btnEscolherDocs";
+            this.btnEscolherDocs.Size = new System.Drawing.Size(149, 23);
+            this.btnEscolherDocs.TabIndex = 0;
+            this.btnEscolherDocs.Text = "button1";
+            this.btnEscolherDocs.UseVisualStyleBackColor = true;
+            this.btnEscolherDocs.Click += new System.EventHandler(this.btnEscolherDocs_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.btnChooseFiles);
+            this.ClientSize = new System.Drawing.Size(872, 468);
+            this.Controls.Add(this.btnEscolherDocs);
             this.Name = "Form1";
             this.Text = "Form1";
             this.ResumeLayout(false);
@@ -55,6 +55,6 @@
 
         #endregion
 
-        private Button btnChooseFiles;
+        private Button btnEscolherDocs;
     }
 }

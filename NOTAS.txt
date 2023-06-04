@@ -1,0 +1,48 @@
+- tratar erro se nao houver campos nos documentos word
+- selecionar todos os registos.
+- preparar o/s documento/s para os vários registos selecionados
+- verificar se existem campos no word nao presentes na tabela da DB, se sim, dar sugestao se quer adicionar esse campo à tabela existente
+
+- Variavel global para nome da tabela iniciada a nulo ou ""
+
+- MÉTODO verificar se já existe tabela com os campos compativeis
+  - CICLO que percorre as tabelas
+    - CICLO que percorre as colunas e compara com a lista de campos dos documentos
+	SE é igual
+		atribui o nome da tabela à variavel global
+		RETORNA verdadeiro
+	SENAO retorna falso
+
+//Antes de usar a variavel tabela nas querys
+//Fazer isto (já atribui o nome correto)
+SE o método returnou falso
+	- Avisar que nao existem tabelas compativeis aos documentos, e tem que se fazer uma com os campos dos documentos
+	- Inputbox para receber o nome
+	- Replace dos espaços por '_'
+	- SE nome nao está nulo nem vazio
+		Criar tabela;
+	- SENAO
+		Avisar que nao pode continuar
+
+
+
+Para os IDs dos registos:
+SELECT rowid
+
+
+listaDocumentos[i].FileName -> É o caminho dos ficheiros
+Pode ser relevante nao usar a lista<string> de caminhos
+
+
+
+
+
+
+
+
+
+
+- ordem das colunas ao verificar, melhor usar uma lista de colunas e ver contains
+
+
+se o ultimo campo do documento já existe na lista LINHA 133
