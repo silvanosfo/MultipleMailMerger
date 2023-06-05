@@ -30,42 +30,28 @@ namespace MultipleMailMerger
         private void btnEscolherDocs_Click(object sender, EventArgs e)
         {
             OpenFileDialog janelaEscolherDocs = new OpenFileDialog();
+
+            //PROPRIEDADES DA JANELA
             janelaEscolherDocs.Title = "Selecionar documentos a tratar";
-
-            //Filtro de tipos de ficheiros a manipular
-            janelaEscolherDocs.Filter = "MS Office Word (*.docx;*.dotx)|*.docx;*.dotx";
-
-            //Ativa a seleção de vários ficheiros
-            janelaEscolherDocs.Multiselect = true;
-            
-            //Guarda o ultimo caminho usado (para melhor usabilidade)
-            janelaEscolherDocs.RestoreDirectory = true;
+            janelaEscolherDocs.Filter = "MS Office Word (*.docx;*.dotx)|*.docx;*.dotx"; //Filtro de tipos de ficheiros a manipular
+            janelaEscolherDocs.Multiselect = true;                                      //Ativa a seleção de vários ficheiros
+            janelaEscolherDocs.RestoreDirectory = true;                                 //Guarda o ultimo caminho usado (para melhor usabilidade)
 
             //Executa a caixa de diálogo
             //SÓ HAVENDO SUBMISSÃO É QUE CONTINUA A SEQUENCIA DO PROGRAMA
             if (janelaEscolherDocs.ShowDialog() == DialogResult.OK)
             {
                 //Captura o caminho dos ficheiros para vir a manipular posteriormente
+                //E carrega os documentos para a lista
                 foreach (string caminho in janelaEscolherDocs.FileNames)
                 {
                     caminhos.Add(caminho);
-                }
 
-                //Document documento = new Document();
-                ///documento.LoadFromFile(janelaEscolherDocs.FileNames[0]);
-
-
-                foreach (string caminho in janelaEscolherDocs.FileNames)
-                {
-                    //Instanciação de váriavel para manipular os documentos Word
                     Document documento = new Document();
-                    //Carrega os documentos
                     documento.LoadFromFile(caminho);
-                    //Adiciona documento carregado à lista
                     listaDocumentos.Add(documento);
                     //VALE A PENA FAZER .Dispose()? Garbage Collector?
                 }
-                
 
                 //SÓ CONTINUA SE OS DOCUMENTOS POSSUIREM CAMPOS
                 if (VerificarExistCamposDocs())
@@ -145,22 +131,6 @@ namespace MultipleMailMerger
                             return true;
                         }
                     }
-
-
-
-                    //foreach (var item in listaDocumentos[i].MailMerge.GetMergeFieldNames())
-                    //{
-                    //    if (!campos.Contains(item))
-                    //    {
-                    //        campos.Add(item);
-
-                    //        //Ultima iteração, todos os campos encontrados e adicionados
-                    //        if (i+1 == listaDocumentos[i].MailMerge.GetMergeFieldNames().Count())
-                    //        {
-                    //            return true;
-                    //        }
-                    //    }
-                    //}
                 }
                 else
                 {

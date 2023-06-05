@@ -1,9 +1,7 @@
-- tratar erro se nao houver campos nos documentos word
 - selecionar todos os registos.
 - preparar o/s documento/s para os vários registos selecionados
 - verificar se existem campos no word nao presentes na tabela da DB, se sim, dar sugestao se quer adicionar esse campo à tabela existente
 
-- Variavel global para nome da tabela iniciada a nulo ou ""
 
 - MÉTODO verificar se já existe tabela com os campos compativeis
   - CICLO que percorre as tabelas
@@ -16,7 +14,8 @@
 //Antes de usar a variavel tabela nas querys
 //Fazer isto (já atribui o nome correto)
 SE o método returnou falso
-	- Avisar que nao existem tabelas compativeis aos documentos, e tem que se fazer uma com os campos dos documentos
+	- Avisar que nao existem tabelas compativeis aos documentos,
+	  e tem que se fazer uma com os campos dos documentos
 	- Inputbox para receber o nome
 	- Replace dos espaços por '_'
 	- SE nome nao está nulo nem vazio
@@ -41,7 +40,6 @@ Pode ser relevante nao usar a lista<string> de caminhos
 
 
 
-
 - ordem das colunas ao verificar, melhor usar uma lista de colunas e ver contains
 
 
@@ -54,3 +52,8 @@ https://www.macoratti.net/17/04/cshp_sqlite1.htm
 https://www.macoratti.net/17/04/cshp_sqlite2.htm
 ler, inserir, editar, apagar registos da tabela especifica a usar nos documentos
 https://www.e-iceblue.com/Tutorials/Spire.Doc/Spire.Doc-Program-Guide/Mail-Merge/Identify-Merge-Field-Names-in-Word-with-C.html
+
+
+-> CONFERIR:
+	- DICIONÁRIO
+	- HIERARQUIA DE PROCESSOS
