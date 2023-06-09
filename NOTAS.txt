@@ -40,7 +40,8 @@ Pode ser relevante nao usar a lista<string> de caminhos
 
 
 
-- ordem das colunas ao verificar, melhor usar uma lista de colunas e ver contains
+ Inserir palavra aleatoria para nome da tabela,
+ para precaver nomes repetidos de tabelas
 
 
 se o ultimo campo do documento já existe na lista LINHA 133

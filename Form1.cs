@@ -25,15 +25,24 @@ namespace MultipleMailMerger
              * Autoscale ou auto size ON
              * Por Icon
              */
+
+            //PROPRIEDADES DA DATAGRID
+            dgvDados.Hide();
         }
 
         private void btnEscolherDocs_Click(object sender, EventArgs e)
         {
+            //Resetar variaveis para começar processo do zero
+            caminhos.Clear();
+            listaDocumentos.Clear();
+            listaCampos.Clear();
+            tabela = "";
+
             OpenFileDialog janelaEscolherDocs = new OpenFileDialog();
 
             //PROPRIEDADES DA JANELA
             janelaEscolherDocs.Title = "Selecionar documentos a tratar";
-            janelaEscolherDocs.Filter = "MS Office Word (*.docx;*.dotx)|*.docx;*.dotx"; //Filtro de tipos de ficheiros a manipular
+            janelaEscolherDocs.Filter = "MS Office Word (*.docx;*.dotx)|*.docx;*.dotx"; //Filtro o tipos de ficheiros a carregar
             janelaEscolherDocs.Multiselect = true;                                      //Ativa a seleção de vários ficheiros
             janelaEscolherDocs.RestoreDirectory = true;                                 //Guarda o ultimo caminho usado (para melhor usabilidade)
 
@@ -78,18 +87,23 @@ namespace MultipleMailMerger
                                                       "documento(s) na base de dados.\n" +
                                                       "Qual o nome que quer dar a essa tabela?", "Nome da Tabela");
 
-                        //Nomes tabelas em SQL nao podem conter espaços!
-                        tabela = tabela.Replace(' ', '_');
-
                         if (!string.IsNullOrEmpty(tabela))
                         {
+                            //Nomes tabelas em SQL nao podem conter espaços!
+                            tabela = tabela.Replace(' ', '_');
+
                             dbManager.CriarTabela(tabela, listaCampos);
                         }
                         else
                         {
                             MessageBox.Show("Impossível continuar!\nRefira um nome para a tabela!");
+                            return; //Pára a execução do método
                         }
                     }
+
+                    dbManager.strSQL = $"SELECT * FROM {tabela}";
+                    dgvDados.DataSource = dbManager.ExecutarQuery();
+                    dgvDados.Show();
                 }
                 else
                 {
@@ -97,6 +111,22 @@ namespace MultipleMailMerger
                                     "Não existem campos no(s) documento(s)!");
                 }
             }
+        }
+
+        private string GerarPalavraAleatoria()
+        {
+            string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            char[] stringChars = new char[8];
+            Random random = new Random();
+
+            for (int i = 0; i < stringChars.Length; i++)
+            {
+                stringChars[i] = chars[random.Next(chars.Length)];
+            }
+
+            var finalString = new String(stringChars);
+
+            return finalString;
         }
 
         /// <summary>
@@ -110,6 +140,7 @@ namespace MultipleMailMerger
         {
             int quantDocs = listaDocumentos.Count();
             int quantCampos;
+            string campoAVerificar;
             for (int i = 0; i < quantDocs; i++)
             {
                 quantCampos = listaDocumentos[i].MailMerge.GetMergeFieldNames().Length;
@@ -119,7 +150,7 @@ namespace MultipleMailMerger
                     //Adicioná-los a uma lista evitando repetições
                     for (int j = 0; j < quantCampos; j++)
                     {
-                        string campoAVerificar = listaDocumentos[i].MailMerge.GetMergeFieldNames()[j];
+                        campoAVerificar = listaDocumentos[i].MailMerge.GetMergeFieldNames()[j];
                         if (!listaCampos.Contains(campoAVerificar))
                         {
                             listaCampos.Add(campoAVerificar);
@@ -157,6 +188,8 @@ namespace MultipleMailMerger
             DbManager bd = new DbManager();
             DataTable nomesTabelas = new DataTable();
             DataTable nomesColunas = new DataTable();
+            int quantColunas;
+            string colunaAVerificar;
 
             //Carregar nomes das tabelas da bd para memória
             bd.strSQL = "SELECT name FROM sqlite_schema " +
@@ -165,7 +198,8 @@ namespace MultipleMailMerger
             nomesTabelas = bd.ExecutarQuery();
 
             //Ciclo para percorrer as tabelas
-            for (int i = 0; i < nomesTabelas.Rows.Count; i++)
+            int quantTabelas = nomesTabelas.Rows.Count;
+            for (int i = 0; i < quantTabelas; i++)
             {
                 //Carregar nomes das colunas da tabela especifica da bd para memória
                 bd.strSQL = "SELECT name " +
@@ -173,35 +207,23 @@ namespace MultipleMailMerger
                 nomesColunas = bd.ExecutarQuery();
 
                 //Ciclo para percorrer as colunas
-                for (int j = 0; j < nomesColunas.Rows.Count; j++)
+                quantColunas = nomesColunas.Rows.Count;
+                for (int j = 0; j < quantColunas; j++)
                 {
-                    //MUDAR PARA CONTAINS! POIS SEGUIR POR ORDEM ESTÁ ERRADO!
-                    //MUDAR PARA CONTAINS! POIS SEGUIR POR ORDEM ESTÁ ERRADO!
-                    //MUDAR PARA CONTAINS! POIS SEGUIR POR ORDEM ESTÁ ERRADO!
-                    //MUDAR PARA CONTAINS! POIS SEGUIR POR ORDEM ESTÁ ERRADO!
-                    //MUDAR PARA CONTAINS! POIS SEGUIR POR ORDEM ESTÁ ERRADO!
-                    //MUDAR PARA CONTAINS! POIS SEGUIR POR ORDEM ESTÁ ERRADO!
-                    //SE NÃO CONTEM OS NOMES DAS COLUNAS NA LISTA DE CAMPOS NA ULTIMA ITERAÇÃO???
-                    //SE NÃO CONTEM OS NOMES DAS COLUNAS NA LISTA DE CAMPOS NA ULTIMA ITERAÇÃO???
-                    //SE NÃO CONTEM OS NOMES DAS COLUNAS NA LISTA DE CAMPOS NA ULTIMA ITERAÇÃO???
-                    //SE NÃO CONTEM OS NOMES DAS COLUNAS NA LISTA DE CAMPOS NA ULTIMA ITERAÇÃO???
-                    if ((string)nomesColunas.Rows[j][0] == listaCampos[j])
+                    colunaAVerificar = (string)nomesColunas.Rows[j][0];
+                    if (listaCampos.Contains(colunaAVerificar))
                     {
                         //ultima interação
                         //significa correspondencia total
-                        if (j+1 == nomesColunas.Rows.Count)
+                        if (j+1 == quantColunas)
                         {
                             tabela = (string)nomesTabelas.Rows[i][0];
                             return true;
                         }
                     }
-                    else
-                    {
-                        return false;
-                    }
                 }
             }
-            //Caso não haja tabelas
+            //Caso não haja tabelas correspondentes
             return false;
         }
     }
