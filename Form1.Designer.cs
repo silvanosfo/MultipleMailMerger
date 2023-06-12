@@ -30,6 +30,8 @@
         {
             this.btnEscolherDocs = new System.Windows.Forms.Button();
             this.dgvDados = new System.Windows.Forms.DataGridView();
+            this.btnGuardar = new System.Windows.Forms.Button();
+            this.btnAtualizar = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgvDados)).BeginInit();
             this.SuspendLayout();
             // 
@@ -52,11 +54,33 @@
             this.dgvDados.Size = new System.Drawing.Size(848, 350);
             this.dgvDados.TabIndex = 1;
             // 
+            // btnGuardar
+            // 
+            this.btnGuardar.Location = new System.Drawing.Point(785, 12);
+            this.btnGuardar.Name = "btnGuardar";
+            this.btnGuardar.Size = new System.Drawing.Size(75, 23);
+            this.btnGuardar.TabIndex = 2;
+            this.btnGuardar.Text = "button1";
+            this.btnGuardar.UseVisualStyleBackColor = true;
+            this.btnGuardar.Click += new System.EventHandler(this.btnGuardar_Click);
+            // 
+            // btnAtualizar
+            // 
+            this.btnAtualizar.Location = new System.Drawing.Point(704, 12);
+            this.btnAtualizar.Name = "btnAtualizar";
+            this.btnAtualizar.Size = new System.Drawing.Size(75, 23);
+            this.btnAtualizar.TabIndex = 3;
+            this.btnAtualizar.Text = "button1";
+            this.btnAtualizar.UseVisualStyleBackColor = true;
+            this.btnAtualizar.Click += new System.EventHandler(this.btnAtualizar_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(872, 468);
+            this.Controls.Add(this.btnAtualizar);
+            this.Controls.Add(this.btnGuardar);
             this.Controls.Add(this.dgvDados);
             this.Controls.Add(this.btnEscolherDocs);
             this.Name = "Form1";
@@ -70,5 +94,7 @@
 
         private Button btnEscolherDocs;
         private DataGridView dgvDados;
+        private Button btnGuardar;
+        private Button btnAtualizar;
     }
 }

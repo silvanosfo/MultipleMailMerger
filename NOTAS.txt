@@ -25,24 +25,6 @@ SE o método returnou falso
 
 
 
-Para os IDs dos registos:
-SELECT rowid
-
-
-listaDocumentos[i].FileName -> É o caminho dos ficheiros
-Pode ser relevante nao usar a lista<string> de caminhos
-
-
-
-
-
-
-
-
-
- Inserir palavra aleatoria para nome da tabela,
- para precaver nomes repetidos de tabelas
-
 
 se o ultimo campo do documento já existe na lista LINHA 133
 

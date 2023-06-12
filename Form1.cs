@@ -20,14 +20,20 @@ namespace MultipleMailMerger
             InitializeComponent();
             this.Text = "Multiple Mail Merger";
             btnEscolherDocs.Text = "Selecionar documentos";
+            btnAtualizar.Text = "Atualizar";
+            btnGuardar.Text = "Guardar";
             /*
              * Background Color azul claro
              * Autoscale ou auto size ON
              * Por Icon
              */
 
-            //PROPRIEDADES DA DATAGRID
+            //ESCONDER CONTROLOS
             dgvDados.Hide();
+            btnAtualizar.Hide();
+            btnGuardar.Hide();
+
+            //PROPRIEDADES DA DATAGRID
         }
 
         private void btnEscolherDocs_Click(object sender, EventArgs e)
@@ -91,6 +97,8 @@ namespace MultipleMailMerger
                         {
                             //Nomes tabelas em SQL nao podem conter espaços!
                             tabela = tabela.Replace(' ', '_');
+                            //Coloca data atual para evitar nomes de tabelas repetidos
+                            tabela = tabela + DateTime.UtcNow.AddHours(1).ToString(@"yyyyMMddhhmmss");
 
                             dbManager.CriarTabela(tabela, listaCampos);
                         }
@@ -101,9 +109,10 @@ namespace MultipleMailMerger
                         }
                     }
 
-                    dbManager.strSQL = $"SELECT * FROM {tabela}";
-                    dgvDados.DataSource = dbManager.ExecutarQuery();
+                    AtualizarGrid();
                     dgvDados.Show();
+                    btnAtualizar.Show();
+                    btnGuardar.Show();
                 }
                 else
                 {
@@ -111,22 +120,6 @@ namespace MultipleMailMerger
                                     "Não existem campos no(s) documento(s)!");
                 }
             }
-        }
-
-        private string GerarPalavraAleatoria()
-        {
-            string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            char[] stringChars = new char[8];
-            Random random = new Random();
-
-            for (int i = 0; i < stringChars.Length; i++)
-            {
-                stringChars[i] = chars[random.Next(chars.Length)];
-            }
-
-            var finalString = new String(stringChars);
-
-            return finalString;
         }
 
         /// <summary>
@@ -203,7 +196,7 @@ namespace MultipleMailMerger
             {
                 //Carregar nomes das colunas da tabela especifica da bd para memória
                 bd.strSQL = "SELECT name " +
-                           $"FROM PRAGMA_TABLE_INFO('{(string)nomesTabelas.Rows[i][0]}')";
+                           $"FROM PRAGMA_TABLE_INFO('{(string)nomesTabelas.Rows[i][0]}');";
                 nomesColunas = bd.ExecutarQuery();
 
                 //Ciclo para percorrer as colunas
@@ -225,6 +218,65 @@ namespace MultipleMailMerger
             }
             //Caso não haja tabelas correspondentes
             return false;
+        }
+
+        private void btnAtualizar_Click(object sender, EventArgs e)
+        {
+            AtualizarGrid();
+        }
+
+        private void AtualizarGrid()
+        {
+            DbManager bd = new DbManager();
+            bd.strSQL = $"SELECT rowid, * FROM {tabela};";
+            dgvDados.DataSource = bd.ExecutarQuery();
+        }
+
+        private void btnGuardar_Click(object sender, EventArgs e)
+        {
+            string nomesColunas = "rowid, ";
+            DbManager bd = new DbManager();
+
+            //Ciclo para montar nomes das colunas
+            for (int i = 0; i < listaCampos.Count; i++)
+            {
+                if (i+1 < listaCampos.Count)
+                {
+                    nomesColunas += listaCampos[i] + ", ";
+                }
+                else
+                {
+                    //ultima iteração, nao leva ", "
+                    nomesColunas += listaCampos[i];
+                }
+            }
+
+            //Ciclo para percorrer linhas
+            for (int i = 0; i < dgvDados.Rows.Count - 1; i++)
+            {
+                //Ciclo para montar dados da linha a inserir (percorrer colunas)
+                string conteudo = "";
+                for (int j = 0; j < dgvDados.ColumnCount; j++)
+                {
+                    if (j + 1 < dgvDados.ColumnCount)
+                    {
+                        conteudo += $"'{dgvDados.Rows[i].Cells[j].Value}', ";
+                    }
+                    else
+                    {
+                        //ultima coluna, nao leva ", "
+                        conteudo += $"'{dgvDados.Rows[i].Cells[j].Value}'";
+                    }
+                }
+
+                //Guarda os dados da linha na BaseDados
+                //bd.strSQL = $"INSERT INTO {tabela} ({nomesColunas}) VALUES ({conteudo});";
+                bd.strSQL = $"INSERT OR REPLACE INTO {tabela} ({nomesColunas}) VALUES ({conteudo});";
+                bd.ExecutarQuery();
+            }
+
+            //Depois de Guardar, atualiza a grid
+            AtualizarGrid();
         }
     }
 }

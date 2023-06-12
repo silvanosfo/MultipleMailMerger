@@ -21,7 +21,6 @@ namespace MultipleMailMerger
             SQLiteConnection sqliteConnection = new SQLiteConnection(strConn);
             sqliteConnection.Open();
             SQLiteCommand comando = new SQLiteCommand(strSQL, sqliteConnection);
-            comando.ExecuteNonQuery();
 
             SQLiteDataAdapter da = new SQLiteDataAdapter(comando);
             DataTable dt = new DataTable();
@@ -57,7 +56,7 @@ namespace MultipleMailMerger
         {
             //var e ciclo que vai montar os campos da tabela
             string caracteristicas = "";
-            int quantCampos = campos.Count();
+            int quantCampos = campos.Count;
             for (int i = 0; i < quantCampos; i++)
             {
                 if (i+1 < quantCampos)
@@ -72,7 +71,7 @@ namespace MultipleMailMerger
                 }
             }
 
-            strSQL = $"CREATE TABLE IF NOT EXISTS {nomeTabela}({caracteristicas});";
+            strSQL = $"CREATE TABLE IF NOT EXISTS {nomeTabela} ({caracteristicas});";
             ExecutarQuery();
         }
     }
