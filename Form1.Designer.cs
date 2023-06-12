@@ -32,6 +32,7 @@
             this.dgvDados = new System.Windows.Forms.DataGridView();
             this.btnGuardar = new System.Windows.Forms.Button();
             this.btnAtualizar = new System.Windows.Forms.Button();
+            this.btnApagar = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgvDados)).BeginInit();
             this.SuspendLayout();
             // 
@@ -74,11 +75,22 @@
             this.btnAtualizar.UseVisualStyleBackColor = true;
             this.btnAtualizar.Click += new System.EventHandler(this.btnAtualizar_Click);
             // 
+            // btnApagar
+            // 
+            this.btnApagar.Location = new System.Drawing.Point(785, 397);
+            this.btnApagar.Name = "btnApagar";
+            this.btnApagar.Size = new System.Drawing.Size(75, 23);
+            this.btnApagar.TabIndex = 4;
+            this.btnApagar.Text = "btnApagar";
+            this.btnApagar.UseVisualStyleBackColor = true;
+            this.btnApagar.Click += new System.EventHandler(this.btnApagar_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(872, 468);
+            this.Controls.Add(this.btnApagar);
             this.Controls.Add(this.btnAtualizar);
             this.Controls.Add(this.btnGuardar);
             this.Controls.Add(this.dgvDados);
@@ -96,5 +108,6 @@
         private DataGridView dgvDados;
         private Button btnGuardar;
         private Button btnAtualizar;
+        private Button btnApagar;
     }
 }

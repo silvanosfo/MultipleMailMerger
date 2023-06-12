@@ -22,6 +22,7 @@ namespace MultipleMailMerger
             btnEscolherDocs.Text = "Selecionar documentos";
             btnAtualizar.Text = "Atualizar";
             btnGuardar.Text = "Guardar";
+            btnApagar.Text = "Apagar";
             /*
              * Background Color azul claro
              * Autoscale ou auto size ON
@@ -32,8 +33,7 @@ namespace MultipleMailMerger
             dgvDados.Hide();
             btnAtualizar.Hide();
             btnGuardar.Hide();
-
-            //PROPRIEDADES DA DATAGRID
+            btnApagar.Hide();
         }
 
         private void btnEscolherDocs_Click(object sender, EventArgs e)
@@ -113,6 +113,11 @@ namespace MultipleMailMerger
                     dgvDados.Show();
                     btnAtualizar.Show();
                     btnGuardar.Show();
+                    btnApagar.Show();
+
+                    //PROPRIEDADES DA DATAGRID
+                    dgvDados.Columns[0].ReadOnly = true;
+                    dgvDados.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
                 }
                 else
                 {
@@ -268,6 +273,15 @@ namespace MultipleMailMerger
                         conteudo += $"'{dgvDados.Rows[i].Cells[j].Value}'";
                     }
                 }
+                
+                //Se a primeira coluna (rowid) estiver vazia
+                if (string.IsNullOrEmpty(dgvDados.Rows[i].Cells[0].Value.ToString()))
+                {
+                    int pos1 = nomesColunas.IndexOf(' ');
+                    nomesColunas = nomesColunas.Remove(0, pos1 + 1);
+                    int pos2 = conteudo.IndexOf(' ');
+                    conteudo = conteudo.Remove(0, pos2 + 1);
+                }
 
                 //Guarda os dados da linha na BaseDados
                 //bd.strSQL = $"INSERT INTO {tabela} ({nomesColunas}) VALUES ({conteudo});";
@@ -276,6 +290,18 @@ namespace MultipleMailMerger
             }
 
             //Depois de Guardar, atualiza a grid
+            AtualizarGrid();
+        }
+
+        private void btnApagar_Click(object sender, EventArgs e)
+        {
+            DbManager bd = new DbManager();
+            for (int i = 0; i < dgvDados.SelectedRows.Count; i++)
+            {
+                bd.strSQL = $"DELETE FROM {tabela} WHERE rowid = {dgvDados.SelectedRows[i].Cells[0].Value}";
+                bd.ExecutarQuery();
+                
+            }
             AtualizarGrid();
         }
     }

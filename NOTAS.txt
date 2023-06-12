@@ -24,6 +24,7 @@ SE o método returnou falso
 		Avisar que nao pode continuar
 
 
+GUARDAR 2 LINHAS AO MESMO TEMPO DÁ ERRO!
 
 
 se o ultimo campo do documento já existe na lista LINHA 133
