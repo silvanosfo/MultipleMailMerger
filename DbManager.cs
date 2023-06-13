@@ -62,7 +62,6 @@ namespace MultipleMailMerger
                 if (i+1 < quantCampos)
                 {
                     caracteristicas += campos[i] + " TEXT, ";
-
                 }
                 else
                 {

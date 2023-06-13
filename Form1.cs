@@ -114,6 +114,7 @@ namespace MultipleMailMerger
                     btnAtualizar.Show();
                     btnGuardar.Show();
                     btnApagar.Show();
+                    btnApagar.Enabled = false;
 
                     //PROPRIEDADES DA DATAGRID
                     dgvDados.Columns[0].ReadOnly = true;
@@ -240,6 +241,7 @@ namespace MultipleMailMerger
         private void btnGuardar_Click(object sender, EventArgs e)
         {
             string nomesColunas = "rowid, ";
+            bool retiradoRowid = false;
             DbManager bd = new DbManager();
 
             //Ciclo para montar nomes das colunas
@@ -273,12 +275,19 @@ namespace MultipleMailMerger
                         conteudo += $"'{dgvDados.Rows[i].Cells[j].Value}'";
                     }
                 }
-                
+
                 //Se a primeira coluna (rowid) estiver vazia
                 if (string.IsNullOrEmpty(dgvDados.Rows[i].Cells[0].Value.ToString()))
                 {
-                    int pos1 = nomesColunas.IndexOf(' ');
-                    nomesColunas = nomesColunas.Remove(0, pos1 + 1);
+                    //Ao guardar várias registos novos, à 2ºx já terá sido retirado "rowid, " da string
+                    //Logo, isto evita retirar outros nomes de colunas da string
+                    //Só retira o "rowid, " apenas da primeira vez
+                    if (!retiradoRowid)
+                    {
+                        int pos1 = nomesColunas.IndexOf(' ');
+                        nomesColunas = nomesColunas.Remove(0, pos1 + 1);
+                        retiradoRowid = true;
+                    }
                     int pos2 = conteudo.IndexOf(' ');
                     conteudo = conteudo.Remove(0, pos2 + 1);
                 }
@@ -303,6 +312,19 @@ namespace MultipleMailMerger
                 
             }
             AtualizarGrid();
+        }
+
+        private void dgvDados_SelectionChanged(object sender, EventArgs e)
+        {
+            //Quando houver rows selecionadas, ativa o botao de apagar
+            if (dgvDados.SelectedRows.Count > 0)
+            {
+                btnApagar.Enabled = true;
+            }
+            else
+            {
+                btnApagar.Enabled = false;
+            }
         }
     }
 }

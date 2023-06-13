@@ -54,6 +54,7 @@
             this.dgvDados.RowTemplate.Height = 25;
             this.dgvDados.Size = new System.Drawing.Size(848, 350);
             this.dgvDados.TabIndex = 1;
+            this.dgvDados.SelectionChanged += new System.EventHandler(this.dgvDados_SelectionChanged);
             // 
             // btnGuardar
             // 
