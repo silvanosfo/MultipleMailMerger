@@ -39,7 +39,7 @@
             // 
             // btnEscolherDocs
             // 
-            this.btnEscolherDocs.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btnEscolherDocs.BackgroundImage")));
+            this.btnEscolherDocs.BackgroundImage = global::MultipleMailMerger.Properties.Resources.load;
             this.btnEscolherDocs.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.btnEscolherDocs.Location = new System.Drawing.Point(12, 12);
             this.btnEscolherDocs.Name = "btnEscolherDocs";
@@ -51,21 +51,25 @@
             // dgvDados
             // 
             this.dgvDados.AllowUserToDeleteRows = false;
+            this.dgvDados.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.dgvDados.BackgroundColor = System.Drawing.Color.AliceBlue;
             this.dgvDados.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvDados.Location = new System.Drawing.Point(10, 62);
             this.dgvDados.Name = "dgvDados";
             this.dgvDados.RowTemplate.Height = 25;
-            this.dgvDados.Size = new System.Drawing.Size(759, 324);
+            this.dgvDados.Size = new System.Drawing.Size(879, 324);
             this.dgvDados.TabIndex = 1;
             this.dgvDados.SelectionChanged += new System.EventHandler(this.dgvDados_SelectionChanged);
             // 
             // btnGuardar
             // 
+            this.btnGuardar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnGuardar.BackColor = System.Drawing.Color.Transparent;
             this.btnGuardar.BackgroundImage = global::MultipleMailMerger.Properties.Resources.save;
             this.btnGuardar.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.btnGuardar.Location = new System.Drawing.Point(725, 12);
+            this.btnGuardar.Location = new System.Drawing.Point(845, 12);
             this.btnGuardar.Name = "btnGuardar";
             this.btnGuardar.Size = new System.Drawing.Size(44, 44);
             this.btnGuardar.TabIndex = 2;
@@ -74,10 +78,11 @@
             // 
             // btnAtualizar
             // 
+            this.btnAtualizar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnAtualizar.BackColor = System.Drawing.Color.Transparent;
-            this.btnAtualizar.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btnAtualizar.BackgroundImage")));
+            this.btnAtualizar.BackgroundImage = global::MultipleMailMerger.Properties.Resources.refresh;
             this.btnAtualizar.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.btnAtualizar.Location = new System.Drawing.Point(675, 12);
+            this.btnAtualizar.Location = new System.Drawing.Point(795, 12);
             this.btnAtualizar.Name = "btnAtualizar";
             this.btnAtualizar.Size = new System.Drawing.Size(44, 44);
             this.btnAtualizar.TabIndex = 3;
@@ -86,10 +91,11 @@
             // 
             // btnApagar
             // 
+            this.btnApagar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnApagar.BackColor = System.Drawing.Color.Transparent;
-            this.btnApagar.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btnApagar.BackgroundImage")));
+            this.btnApagar.BackgroundImage = global::MultipleMailMerger.Properties.Resources.delete;
             this.btnApagar.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.btnApagar.Location = new System.Drawing.Point(725, 392);
+            this.btnApagar.Location = new System.Drawing.Point(845, 392);
             this.btnApagar.Name = "btnApagar";
             this.btnApagar.Size = new System.Drawing.Size(44, 44);
             this.btnApagar.TabIndex = 4;
@@ -101,7 +107,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.AliceBlue;
-            this.ClientSize = new System.Drawing.Size(781, 442);
+            this.ClientSize = new System.Drawing.Size(901, 442);
             this.Controls.Add(this.btnApagar);
             this.Controls.Add(this.btnAtualizar);
             this.Controls.Add(this.btnGuardar);

@@ -8,11 +8,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <StartupObject>MultipleMailMerger.Program</StartupObject>
     <PlatformTarget>x64</PlatformTarget>
-    <ApplicationIcon>bin\Debug\net6.0-windows\Resources\program.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\program.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="bin\Debug\net6.0-windows\Resources\program.ico" />
+    <Content Include="Resources\program.ico">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -33,6 +35,25 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="bin\Debug\net6.0-windows\Resources\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Resources\delete.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\load.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\refresh.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\save.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

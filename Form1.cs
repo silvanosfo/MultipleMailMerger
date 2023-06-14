@@ -20,17 +20,10 @@ namespace MultipleMailMerger
         {
             InitializeComponent();
             this.Text = "Multiple Mail Merger";
-            this.AutoSize = true;
-            this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            //this.AutoSize = true;
+            //this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             this.StartPosition = FormStartPosition.CenterScreen;
-
-            dgvDados.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
-
-            /*
-             * Background Color azul claro
-             * Autoscale ou auto size ON
-             * Por Icon
-             */
+            //this.MaximumSize = new Size(1780, 900);
 
             //ESCONDER CONTROLOS
             dgvDados.Hide();
@@ -111,7 +104,6 @@ namespace MultipleMailMerger
                             return; //Pára a execução do método
                         }
                     }
-
                     AtualizarGrid();
                     dgvDados.Show();
                     btnAtualizar.Show();
@@ -119,15 +111,27 @@ namespace MultipleMailMerger
                     btnApagar.Show();
                     btnApagar.Enabled = false;
 
-                    //PROPRIEDADES DA DATAGRID
-                    dgvDados.Columns[0].ReadOnly = true;
-                    dgvDados.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
+                    FormatarDGV();
                 }
                 else
                 {
                     MessageBox.Show("Impossível continuar\n" +
                                     "Não existem campos no(s) documento(s)!");
                 }
+            }
+        }
+
+        private void FormatarDGV()
+        {
+            //PROPRIEDADES DA DATAGRID
+            dgvDados.Columns [0].ReadOnly = true;
+            dgvDados.Columns [0].AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
+            dgvDados.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+
+            //Não pode ordenar por colunas
+            foreach (DataGridViewColumn dgvc in dgvDados.Columns)
+            {
+                dgvc.SortMode = DataGridViewColumnSortMode.NotSortable;
             }
         }
 
@@ -307,7 +311,6 @@ namespace MultipleMailMerger
         private void btnApagar_Click(object sender, EventArgs e)
         {
             DbManager bd = new DbManager();
-            string teste;
             for (int i = 0; i < dgvDados.SelectedRows.Count; i++)
             {
                 //Evitar erro de apagar ultima linha vazia
