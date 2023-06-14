@@ -5,6 +5,7 @@ using Microsoft.VisualBasic;
 using System.Data;
 using static System.ComponentModel.Design.ObjectSelectorEditor;
 using System.Xml.Linq;
+using Spire.Doc.Fields.Shapes;
 
 namespace MultipleMailMerger
 {
@@ -19,10 +20,12 @@ namespace MultipleMailMerger
         {
             InitializeComponent();
             this.Text = "Multiple Mail Merger";
-            btnEscolherDocs.Text = "Selecionar documentos";
-            btnAtualizar.Text = "Atualizar";
-            btnGuardar.Text = "Guardar";
-            btnApagar.Text = "Apagar";
+            this.AutoSize = true;
+            this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            this.StartPosition = FormStartPosition.CenterScreen;
+
+            dgvDados.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+
             /*
              * Background Color azul claro
              * Autoscale ou auto size ON
@@ -293,7 +296,6 @@ namespace MultipleMailMerger
                 }
 
                 //Guarda os dados da linha na BaseDados
-                //bd.strSQL = $"INSERT INTO {tabela} ({nomesColunas}) VALUES ({conteudo});";
                 bd.strSQL = $"INSERT OR REPLACE INTO {tabela} ({nomesColunas}) VALUES ({conteudo});";
                 bd.ExecutarQuery();
             }
@@ -305,11 +307,15 @@ namespace MultipleMailMerger
         private void btnApagar_Click(object sender, EventArgs e)
         {
             DbManager bd = new DbManager();
+            string teste;
             for (int i = 0; i < dgvDados.SelectedRows.Count; i++)
             {
-                bd.strSQL = $"DELETE FROM {tabela} WHERE rowid = {dgvDados.SelectedRows[i].Cells[0].Value}";
-                bd.ExecutarQuery();
-                
+                //Evitar erro de apagar ultima linha vazia
+                if (dgvDados.SelectedRows[i].Cells[0].Value != null)
+                {
+                    bd.strSQL = $"DELETE FROM {tabela} WHERE rowid = {dgvDados.SelectedRows[i].Cells[0].Value}";
+                    bd.ExecutarQuery();
+                }
             }
             AtualizarGrid();
         }

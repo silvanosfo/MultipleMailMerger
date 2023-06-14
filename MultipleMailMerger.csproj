@@ -8,11 +8,31 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <StartupObject>MultipleMailMerger.Program</StartupObject>
     <PlatformTarget>x64</PlatformTarget>
+    <ApplicationIcon>bin\Debug\net6.0-windows\Resources\program.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="bin\Debug\net6.0-windows\Resources\program.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Spire.Doc" Version="11.6.1" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.117" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>
