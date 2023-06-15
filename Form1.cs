@@ -6,6 +6,7 @@ using System.Data;
 using static System.ComponentModel.Design.ObjectSelectorEditor;
 using System.Xml.Linq;
 using Spire.Doc.Fields.Shapes;
+using word = Microsoft.Office.Interop.Word;
 
 namespace MultipleMailMerger
 {
@@ -30,6 +31,7 @@ namespace MultipleMailMerger
             btnAtualizar.Hide();
             btnGuardar.Hide();
             btnApagar.Hide();
+            btnCriarDocs.Hide();
         }
 
         private void btnEscolherDocs_Click(object sender, EventArgs e)
@@ -52,10 +54,14 @@ namespace MultipleMailMerger
             //SÓ HAVENDO SUBMISSÃO É QUE CONTINUA A SEQUENCIA DO PROGRAMA
             if (janelaEscolherDocs.ShowDialog() == DialogResult.OK)
             {
+                int pos;
                 //Captura o caminho dos ficheiros para vir a manipular posteriormente
                 //E carrega os documentos para a lista
                 foreach (string caminho in janelaEscolherDocs.FileNames)
                 {
+                    //pos = caminho.LastIndexOf('.');
+                    //caminho.Remove(40,5);
+                    //caminho.Replace(".docx", ".pdf");
                     caminhos.Add(caminho);
 
                     Document documento = new Document();
@@ -108,8 +114,6 @@ namespace MultipleMailMerger
                     dgvDados.Show();
                     btnAtualizar.Show();
                     btnGuardar.Show();
-                    btnApagar.Show();
-                    btnApagar.Enabled = false;
 
                     FormatarDGV();
                 }
@@ -233,18 +237,6 @@ namespace MultipleMailMerger
             return false;
         }
 
-        private void btnAtualizar_Click(object sender, EventArgs e)
-        {
-            AtualizarGrid();
-        }
-
-        private void AtualizarGrid()
-        {
-            DbManager bd = new DbManager();
-            bd.strSQL = $"SELECT rowid, * FROM {tabela};";
-            dgvDados.DataSource = bd.ExecutarQuery();
-        }
-
         private void btnGuardar_Click(object sender, EventArgs e)
         {
             string nomesColunas = "rowid, ";
@@ -323,17 +315,98 @@ namespace MultipleMailMerger
             AtualizarGrid();
         }
 
+        private void btnCriarDocs_Click(object sender, EventArgs e)
+        {
+            List<string> conteudo = new List<string>();
+            DataGridViewRow row = new DataGridViewRow();
+            row = dgvDados.CurrentRow;
+
+            foreach (DataGridViewCell cell in row.Cells)
+            {
+                conteudo.Add(string.Format("{0}", cell.Value));
+            }
+
+            //remove o id que vem da tabela
+            //não é usado nos campos
+            conteudo.RemoveAt(0);
+
+
+            for (int i = 0; i < listaDocumentos.Count; i++)
+            {
+                listaDocumentos[i].MailMerge.Execute(listaCampos.ToArray(), conteudo.ToArray());
+                listaDocumentos[i].SaveToFile(caminhos[i] + "_teste.docx", FileFormat.Docx2019);
+            }
+
+            //Para remover a linha de usar o nuget package sem licença
+            //Editamos e removemos o primeiro paragrafo dos documentos com recurso
+            //A uma biblioteca grátis
+            //Esta biblioteca faz uso do MS Word do sistema em background para realizar as operações (+ lento)
+            word.Application app = new word.Application();
+            word.Document doc = app.Documents.Open(caminhos[0] + "_teste.docx");
+
+            doc.Paragraphs[1].Range.Delete();
+
+            //Supostamente o close guarda e fecha o documento
+            doc.Close();
+            app.Quit();
+
+            //doc.SaveAs2(caminhos[0] + "_teste2.docx", word.WdSaveFormat.wdFormatDocument);
+
+
+
+            MessageBox.Show("Ficheiro/s criado/s");
+        }
+
+        private void AtualizarGrid()
+        {
+            DbManager bd = new DbManager();
+            bd.strSQL = $"SELECT rowid, * FROM {tabela};";
+            dgvDados.DataSource = bd.ExecutarQuery();
+        }
+
+        private void btnAtualizar_Click(object sender, EventArgs e)
+        {
+            AtualizarGrid();
+        }
+
         private void dgvDados_SelectionChanged(object sender, EventArgs e)
         {
             //Quando houver rows selecionadas, ativa o botao de apagar
             if (dgvDados.SelectedRows.Count > 0)
             {
-                btnApagar.Enabled = true;
+                btnApagar.Show();
+                btnCriarDocs.Show();
             }
             else
             {
-                btnApagar.Enabled = false;
+                btnApagar.Hide();
+                btnCriarDocs.Hide();
             }
+        }
+
+        private void btnEscolherDocs_MouseHover(object sender, EventArgs e)
+        {
+            tTipDetails.Show("Carregar documentos", btnEscolherDocs);
+        }
+
+        private void btnAtualizar_MouseHover(object sender, EventArgs e)
+        {
+            tTipDetails.Show("Atualizar", btnAtualizar);
+        }
+
+        private void btnGuardar_MouseHover(object sender, EventArgs e)
+        {
+            tTipDetails.Show("Guardar", btnGuardar);
+        }
+
+        private void btnApagar_MouseHover(object sender, EventArgs e)
+        {
+            tTipDetails.Show("Apagar", btnApagar);
+        }
+
+        private void btnCriarDocs_MouseHover(object sender, EventArgs e)
+        {
+            tTipDetails.Show("Exportar", btnCriarDocs);
         }
     }
 }

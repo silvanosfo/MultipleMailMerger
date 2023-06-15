@@ -29,6 +29,9 @@ https://www.youtube.com/watch?v=dOdPf6jgtPQ
 ler, inserir, editar, apagar registos da tabela especifica a usar nos documentos
 https://www.e-iceblue.com/Tutorials/Spire.Doc/Spire.Doc-Program-Guide/Mail-Merge/Identify-Merge-Field-Names-in-Word-with-C.html
 
+https://www.ryadel.com/en/open-edit-word-doc-docx-file-byte-array-c-msword-interop/
+https://stackoverflow.com/questions/36994616/how-to-open-a-word-file-with-interop-word
+
 
 -> CONFERIR:
 	- DICIONÁRIO

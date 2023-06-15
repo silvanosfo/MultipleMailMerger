@@ -28,12 +28,15 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.btnEscolherDocs = new System.Windows.Forms.Button();
             this.dgvDados = new System.Windows.Forms.DataGridView();
             this.btnGuardar = new System.Windows.Forms.Button();
             this.btnAtualizar = new System.Windows.Forms.Button();
             this.btnApagar = new System.Windows.Forms.Button();
+            this.btnCriarDocs = new System.Windows.Forms.Button();
+            this.tTipDetails = new System.Windows.Forms.ToolTip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.dgvDados)).BeginInit();
             this.SuspendLayout();
             // 
@@ -41,12 +44,13 @@
             // 
             this.btnEscolherDocs.BackgroundImage = global::MultipleMailMerger.Properties.Resources.load;
             this.btnEscolherDocs.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.btnEscolherDocs.Location = new System.Drawing.Point(12, 12);
+            this.btnEscolherDocs.Location = new System.Drawing.Point(10, 12);
             this.btnEscolherDocs.Name = "btnEscolherDocs";
             this.btnEscolherDocs.Size = new System.Drawing.Size(44, 44);
             this.btnEscolherDocs.TabIndex = 0;
             this.btnEscolherDocs.UseVisualStyleBackColor = true;
             this.btnEscolherDocs.Click += new System.EventHandler(this.btnEscolherDocs_Click);
+            this.btnEscolherDocs.MouseHover += new System.EventHandler(this.btnEscolherDocs_MouseHover);
             // 
             // dgvDados
             // 
@@ -75,6 +79,7 @@
             this.btnGuardar.TabIndex = 2;
             this.btnGuardar.UseVisualStyleBackColor = false;
             this.btnGuardar.Click += new System.EventHandler(this.btnGuardar_Click);
+            this.btnGuardar.MouseHover += new System.EventHandler(this.btnGuardar_MouseHover);
             // 
             // btnAtualizar
             // 
@@ -88,6 +93,7 @@
             this.btnAtualizar.TabIndex = 3;
             this.btnAtualizar.UseVisualStyleBackColor = false;
             this.btnAtualizar.Click += new System.EventHandler(this.btnAtualizar_Click);
+            this.btnAtualizar.MouseHover += new System.EventHandler(this.btnAtualizar_MouseHover);
             // 
             // btnApagar
             // 
@@ -101,6 +107,21 @@
             this.btnApagar.TabIndex = 4;
             this.btnApagar.UseVisualStyleBackColor = false;
             this.btnApagar.Click += new System.EventHandler(this.btnApagar_Click);
+            this.btnApagar.MouseHover += new System.EventHandler(this.btnApagar_MouseHover);
+            // 
+            // btnCriarDocs
+            // 
+            this.btnCriarDocs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnCriarDocs.BackColor = System.Drawing.Color.Transparent;
+            this.btnCriarDocs.BackgroundImage = global::MultipleMailMerger.Properties.Resources.export;
+            this.btnCriarDocs.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.btnCriarDocs.Location = new System.Drawing.Point(10, 392);
+            this.btnCriarDocs.Name = "btnCriarDocs";
+            this.btnCriarDocs.Size = new System.Drawing.Size(44, 44);
+            this.btnCriarDocs.TabIndex = 5;
+            this.btnCriarDocs.UseVisualStyleBackColor = false;
+            this.btnCriarDocs.Click += new System.EventHandler(this.btnCriarDocs_Click);
+            this.btnCriarDocs.MouseHover += new System.EventHandler(this.btnCriarDocs_MouseHover);
             // 
             // Form1
             // 
@@ -108,6 +129,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.AliceBlue;
             this.ClientSize = new System.Drawing.Size(901, 442);
+            this.Controls.Add(this.btnCriarDocs);
             this.Controls.Add(this.btnApagar);
             this.Controls.Add(this.btnAtualizar);
             this.Controls.Add(this.btnGuardar);
@@ -128,5 +150,7 @@
         private Button btnGuardar;
         private Button btnAtualizar;
         private Button btnApagar;
+        private Button btnCriarDocs;
+        private ToolTip tTipDetails;
     }
 }
