@@ -12,7 +12,8 @@ namespace MultipleMailMerger
 {
     public partial class Form1 : Form
     {
-        private List<string> caminhos = new List<string>();
+        private List<string> nomesDocs = new List<string>();
+        private List<string> caminhosDocs = new List<string>();
         private List<Document> listaDocumentos = new List<Document>();
         private List<string> listaCampos = new List<string>();
         public string tabela = "";
@@ -37,7 +38,7 @@ namespace MultipleMailMerger
         private void btnEscolherDocs_Click(object sender, EventArgs e)
         {
             //Resetar variaveis para começar processo do zero
-            caminhos.Clear();
+            nomesDocs.Clear();
             listaDocumentos.Clear();
             listaCampos.Clear();
             tabela = "";
@@ -54,15 +55,12 @@ namespace MultipleMailMerger
             //SÓ HAVENDO SUBMISSÃO É QUE CONTINUA A SEQUENCIA DO PROGRAMA
             if (janelaEscolherDocs.ShowDialog() == DialogResult.OK)
             {
-                int pos;
                 //Captura o caminho dos ficheiros para vir a manipular posteriormente
                 //E carrega os documentos para a lista
                 foreach (string caminho in janelaEscolherDocs.FileNames)
                 {
-                    //pos = caminho.LastIndexOf('.');
-                    //caminho.Remove(40,5);
-                    //caminho.Replace(".docx", ".pdf");
-                    caminhos.Add(caminho);
+                    nomesDocs.Add(Path.GetFileNameWithoutExtension(caminho));
+                    caminhosDocs.Add(Path.GetDirectoryName(caminho));
 
                     Document documento = new Document();
                     documento.LoadFromFile(caminho);
@@ -330,31 +328,57 @@ namespace MultipleMailMerger
             //não é usado nos campos
             conteudo.RemoveAt(0);
 
+            //Prepara a janela para escolher pasta de said
+            FolderBrowserDialog pastaSaida = new FolderBrowserDialog();
+            pastaSaida.Description = "Escolha uma pasta para guardar os documentos";
+            pastaSaida.UseDescriptionForTitle = true;
+            pastaSaida.ShowNewFolderButton = true;
 
-            for (int i = 0; i < listaDocumentos.Count; i++)
+            //Executa a Janela
+            if (pastaSaida.ShowDialog() == DialogResult.OK)
             {
-                listaDocumentos[i].MailMerge.Execute(listaCampos.ToArray(), conteudo.ToArray());
-                listaDocumentos[i].SaveToFile(caminhos[i] + "_teste.docx", FileFormat.Docx2019);
+                word.Application app = new word.Application();
+                string caminhoMontado;
+
+                for (int i = 0; i < listaDocumentos.Count; i++)
+                {
+                    caminhoMontado = $"{caminhosDocs[i]}\\{nomesDocs[i]}_output.docx";
+
+                    listaDocumentos[i].MailMerge.Execute(listaCampos.ToArray(), conteudo.ToArray());
+                    listaDocumentos[i].SaveToFile(caminhoMontado, FileFormat.Docx2019);
+
+                    //listaDocumentos[i].SaveToFile(pastaSaida.SelectedPath + "\\"+ nomesDocs[i] + "_teste.docx", FileFormat.Docx2019);
+
+                    //Para remover a linha de usar o nuget package Spire.Doc sem licença
+                    //Editamos os documentos e removemos o primeiro paragrafo usando uma biblioteca do sistema
+                    //Esta biblioteca faz uso do MS Word do sistema em background para realizar as operações (+ lento)
+                    
+                    //word.Document doc = app.Documents.Open(pastaSaida.SelectedPath + "\\" + nomesDocs[i] + "_teste.docx");
+
+                    word.Document doc = app.Documents.Open(caminhoMontado);
+                    doc.Paragraphs[1].Range.Delete();
+
+                    //Guarda e fecha o documento
+                    doc.Close();
+
+                    int contador = 1;
+                    string ext = ".docx";
+                    string caminhoSaida = $"{pastaSaida.SelectedPath}\\{nomesDocs[i]}_teste{ext}";
+                    while (File.Exists(caminhoSaida))
+                    {
+                        caminhoSaida = $"{pastaSaida.SelectedPath}\\{nomesDocs[i]}_teste ({contador}){ext}";
+                        contador++;
+                    }
+                    File.Move(caminhoMontado, caminhoSaida);
+
+                    //doc.SaveAs2(caminhos[0] + "_teste2.docx", word.WdSaveFormat.wdFormatDocument);
+                }
+                //Fecha MS Word que corre em 2º plano
+                app.Quit();
+
+
+                MessageBox.Show("Ficheiro/s criado/s");
             }
-
-            //Para remover a linha de usar o nuget package sem licença
-            //Editamos e removemos o primeiro paragrafo dos documentos com recurso
-            //A uma biblioteca grátis
-            //Esta biblioteca faz uso do MS Word do sistema em background para realizar as operações (+ lento)
-            word.Application app = new word.Application();
-            word.Document doc = app.Documents.Open(caminhos[0] + "_teste.docx");
-
-            doc.Paragraphs[1].Range.Delete();
-
-            //Supostamente o close guarda e fecha o documento
-            doc.Close();
-            app.Quit();
-
-            //doc.SaveAs2(caminhos[0] + "_teste2.docx", word.WdSaveFormat.wdFormatDocument);
-
-
-
-            MessageBox.Show("Ficheiro/s criado/s");
         }
 
         private void AtualizarGrid()

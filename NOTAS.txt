@@ -24,13 +24,32 @@ SE o método returnou falso
 		Avisar que nao pode continuar
 
 
+
+Guardar documento na pasta origem com "_output.docx"
+tirar paragrafo do documento guardar sobrepondo
+Copiar documento para pasta saida sem sobrepor File.Cpoy(sourcefile, destination, false)
+Apagar documento da pasta origem
+
+
+
+
+
+
 #LINKS:
 https://www.youtube.com/watch?v=dOdPf6jgtPQ
 ler, inserir, editar, apagar registos da tabela especifica a usar nos documentos
 https://www.e-iceblue.com/Tutorials/Spire.Doc/Spire.Doc-Program-Guide/Mail-Merge/Identify-Merge-Field-Names-in-Word-with-C.html
 
-https://www.ryadel.com/en/open-edit-word-doc-docx-file-byte-array-c-msword-interop/
-https://stackoverflow.com/questions/36994616/how-to-open-a-word-file-with-interop-word
+
+GUARDAR VARIOS DOCUMENTOS DIFERENTES de um registo FEITO
+GUARDAR O MESMO DOCUMENTOS DE Vários REGISTOS
+GUARDAR VARIOS DOCUMENTOS DE VÀRIOS REGISTOS
+
+
+Depois de exportar documentos, na 2ºvez ao guardar os documentos sao inseridos os registos anteriores, nem com debug encontro o problema!!!
+
+
+TESTAR ATUALIZAR A DATAGRIVVIEW APÒS HAVER EXPORTAÇªAO
 
 
 -> CONFERIR:
