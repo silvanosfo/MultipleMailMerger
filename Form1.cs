@@ -338,38 +338,42 @@ namespace MultipleMailMerger
             if (pastaSaida.ShowDialog() == DialogResult.OK)
             {
                 word.Application app = new word.Application();
-                string caminhoMontado;
+                string caminhoMontado, ext;
 
                 for (int i = 0; i < listaDocumentos.Count; i++)
                 {
-                    caminhoMontado = $"{caminhosDocs[i]}\\{nomesDocs[i]}_output.docx";
+                    ext = ".docx";
+                    caminhoMontado = $"{caminhosDocs[i]}\\{nomesDocs[i]}_output";
 
                     listaDocumentos[i].MailMerge.Execute(listaCampos.ToArray(), conteudo.ToArray());
-                    listaDocumentos[i].SaveToFile(caminhoMontado, FileFormat.Docx2019);
-
-                    //listaDocumentos[i].SaveToFile(pastaSaida.SelectedPath + "\\"+ nomesDocs[i] + "_teste.docx", FileFormat.Docx2019);
+                    listaDocumentos[i].SaveToFile(caminhoMontado + ext, FileFormat.Docx2019);
 
                     //Para remover a linha de usar o nuget package Spire.Doc sem licença
                     //Editamos os documentos e removemos o primeiro paragrafo usando uma biblioteca do sistema
                     //Esta biblioteca faz uso do MS Word do sistema em background para realizar as operações (+ lento)
                     
-                    //word.Document doc = app.Documents.Open(pastaSaida.SelectedPath + "\\" + nomesDocs[i] + "_teste.docx");
-
-                    word.Document doc = app.Documents.Open(caminhoMontado);
+                    word.Document doc = app.Documents.Open(caminhoMontado + ext);
                     doc.Paragraphs[1].Range.Delete();
 
                     //Guarda e fecha o documento
+                    //doc.Close();
+
+                    //Guarda em pdf
+                    doc.ExportAsFixedFormat($"{caminhosDocs[i]}\\{nomesDocs[i]}_output.pdf", word.WdExportFormat.wdExportFormatPDF);
+                    //Fecha o documentos e guarda os conteudos
                     doc.Close();
+                    //Apaga o ficheiro pois já não é mais necessário
+                    File.Delete(caminhoMontado + ext);
 
                     int contador = 1;
-                    string ext = ".docx";
+                    ext = ".pdf";
                     string caminhoSaida = $"{pastaSaida.SelectedPath}\\{nomesDocs[i]}_teste{ext}";
                     while (File.Exists(caminhoSaida))
                     {
                         caminhoSaida = $"{pastaSaida.SelectedPath}\\{nomesDocs[i]}_teste ({contador}){ext}";
                         contador++;
                     }
-                    File.Move(caminhoMontado, caminhoSaida);
+                    File.Move(caminhoMontado + ext, caminhoSaida);
 
                     //doc.SaveAs2(caminhos[0] + "_teste2.docx", word.WdSaveFormat.wdFormatDocument);
                 }
