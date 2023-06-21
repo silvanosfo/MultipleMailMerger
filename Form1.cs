@@ -240,6 +240,10 @@ namespace MultipleMailMerger
             bool retiradoRowid = false;
             DbManager bd = new DbManager();
 
+            ////////////////
+            //EDITAR DADOS
+            ////////////////
+            
             //Ciclo para montar nomes das colunas
             for (int i = 0; i < listaCampos.Count; i++)
             {
@@ -271,6 +275,10 @@ namespace MultipleMailMerger
                         conteudo += $"'{dgvDados.Rows[i].Cells[j].Value}'";
                     }
                 }
+
+                ////////////////
+                //INSERIR DADOS
+                ////////////////
 
                 //Se a primeira coluna (rowid) estiver vazia
                 if (string.IsNullOrEmpty(dgvDados.Rows[i].Cells[0].Value.ToString()))
@@ -377,7 +385,7 @@ namespace MultipleMailMerger
                     File.Delete(caminhoTemp);
 
                     //Converte o pdf em PDF/A 
-                    //Versão FREE de uma paga
+                    //Versão FREE da biblioteca Spire.PDF paga
                     //Máximo de paginas PDF 10!!!
                     //10 PÁGINAS!
                     PdfStandardsConverter pdf_a = new PdfStandardsConverter(caminhoSaida);
