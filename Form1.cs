@@ -7,13 +7,13 @@ using static System.ComponentModel.Design.ObjectSelectorEditor;
 using System.Xml.Linq;
 using Spire.Doc.Fields.Shapes;
 using word = Microsoft.Office.Interop.Word;
+using Spire.Pdf.Conversion;
 
 namespace MultipleMailMerger
 {
     public partial class Form1 : Form
     {
-        private List<string> nomesDocs = new List<string>();
-        private List<string> caminhosDocs = new List<string>();
+        private List<string> caminhos = new List<string>();
         private List<Document> listaDocumentos = new List<Document>();
         private List<string> listaCampos = new List<string>();
         public string tabela = "";
@@ -38,7 +38,7 @@ namespace MultipleMailMerger
         private void btnEscolherDocs_Click(object sender, EventArgs e)
         {
             //Resetar variaveis para começar processo do zero
-            nomesDocs.Clear();
+            caminhos.Clear();
             listaDocumentos.Clear();
             listaCampos.Clear();
             tabela = "";
@@ -59,8 +59,7 @@ namespace MultipleMailMerger
                 //E carrega os documentos para a lista
                 foreach (string caminho in janelaEscolherDocs.FileNames)
                 {
-                    nomesDocs.Add(Path.GetFileNameWithoutExtension(caminho));
-                    caminhosDocs.Add(Path.GetDirectoryName(caminho));
+                    caminhos.Add(caminho);
 
                     Document documento = new Document();
                     documento.LoadFromFile(caminho);
@@ -323,9 +322,8 @@ namespace MultipleMailMerger
             {
                 conteudo.Add(string.Format("{0}", cell.Value));
             }
-
             //remove o id que vem da tabela
-            //não é usado nos campos
+            //não é usado nos campos para os documentos
             conteudo.RemoveAt(0);
 
             //Prepara a janela para escolher pasta de said
@@ -337,49 +335,57 @@ namespace MultipleMailMerger
             //Executa a Janela
             if (pastaSaida.ShowDialog() == DialogResult.OK)
             {
-                word.Application app = new word.Application();
-                string caminhoMontado, ext;
+                word.Application wordapp = new word.Application();
+                string caminhoTemp, ext;
 
                 for (int i = 0; i < listaDocumentos.Count; i++)
                 {
-                    ext = ".docx";
-                    caminhoMontado = $"{caminhosDocs[i]}\\{nomesDocs[i]}_output";
+                    //Caminho para o local onde ficará o ficheiro .docx "temporário" populado a manipular
+                    caminhoTemp = $"{Path.GetDirectoryName(caminhos[i])}\\{Path.GetFileNameWithoutExtension(caminhos[i])}_temp.docx";
 
                     listaDocumentos[i].MailMerge.Execute(listaCampos.ToArray(), conteudo.ToArray());
-                    listaDocumentos[i].SaveToFile(caminhoMontado + ext, FileFormat.Docx2019);
+                    listaDocumentos[i].SaveToFile(caminhoTemp, FileFormat.Docx2019);
 
                     //Para remover a linha de usar o nuget package Spire.Doc sem licença
-                    //Editamos os documentos e removemos o primeiro paragrafo usando uma biblioteca do sistema
+                    //Editamos o documento e removemos o primeiro paragrafo usando uma biblioteca do sistema
                     //Esta biblioteca faz uso do MS Word do sistema em background para realizar as operações (+ lento)
-                    
-                    word.Document doc = app.Documents.Open(caminhoMontado + ext);
+                    word.Document doc = wordapp.Documents.Open(caminhoTemp);
                     doc.Paragraphs[1].Range.Delete();
 
-                    //Guarda e fecha o documento
-                    //doc.Close();
+                    //Algoritmo para mudar o nome do ficheiro a exportar em .pdf
+                    //Em caso de já existir evita substituição/sobreposição
+                    //Tem que ser feito à mão pois não há metodos que replicam o processo do Windows usado no sistema operativo.
+                    int c = 1;
+                    string copias = "";
+                    ext = ".pdf";
+                    string caminhoSaida = $"{pastaSaida.SelectedPath}\\{Path.GetFileNameWithoutExtension(caminhos[i])}";
+                    while (File.Exists($"{caminhoSaida}{copias}{ext}"))
+                    {
+                        copias = $" ({c})";
+                        c++;
+                    }
+
+                    //Após ser encontrado um nome livre, montaámos o caminho completo.
+                    caminhoSaida = caminhoSaida + copias + ext;
 
                     //Guarda em pdf
-                    doc.ExportAsFixedFormat($"{caminhosDocs[i]}\\{nomesDocs[i]}_output.pdf", word.WdExportFormat.wdExportFormatPDF);
-                    //Fecha o documentos e guarda os conteudos
+                    doc.ExportAsFixedFormat(caminhoSaida, word.WdExportFormat.wdExportFormatPDF);
+
+                    //Fecha o documentos .docx "temporários" e guarda os conteudos
                     doc.Close();
-                    //Apaga o ficheiro pois já não é mais necessário
-                    File.Delete(caminhoMontado + ext);
+                    //Apaga o ficheiro .docx "temporário" pois já não é mais necessário
+                    File.Delete(caminhoTemp);
 
-                    int contador = 1;
-                    ext = ".pdf";
-                    string caminhoSaida = $"{pastaSaida.SelectedPath}\\{nomesDocs[i]}_teste{ext}";
-                    while (File.Exists(caminhoSaida))
-                    {
-                        caminhoSaida = $"{pastaSaida.SelectedPath}\\{nomesDocs[i]}_teste ({contador}){ext}";
-                        contador++;
-                    }
-                    File.Move(caminhoMontado + ext, caminhoSaida);
+                    //Converte o pdf em PDF/A 
+                    //Versão FREE de uma paga
+                    //Máximo de paginas PDF 10!!!
+                    //10 PÁGINAS!
+                    PdfStandardsConverter pdf_a = new PdfStandardsConverter(caminhoSaida);
+                    pdf_a.ToPdfA1B(caminhoSaida);
 
-                    //doc.SaveAs2(caminhos[0] + "_teste2.docx", word.WdSaveFormat.wdFormatDocument);
                 }
                 //Fecha MS Word que corre em 2º plano
-                app.Quit();
-
+                wordapp.Quit();
 
                 MessageBox.Show("Ficheiro/s criado/s");
             }
@@ -402,8 +408,19 @@ namespace MultipleMailMerger
             //Quando houver rows selecionadas, ativa o botao de apagar
             if (dgvDados.SelectedRows.Count > 0)
             {
+                //Por agora só dá para criar documentos de um registo de cada vez
+                //MUDAR ALGORITMO DE EXPORTAR DOCUMENTOS
+                //para permitar exportar documentos para os vários registos
+                if (dgvDados.SelectedRows.Count == 1)
+                {
+                    btnCriarDocs.Show();
+                }
+                else
+                {
+                    btnCriarDocs.Hide();
+                }
+
                 btnApagar.Show();
-                btnCriarDocs.Show();
             }
             else
             {

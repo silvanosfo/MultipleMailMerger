@@ -1,4 +1,3 @@
-- selecionar todos os registos.
 - preparar o/s documento/s para os vários registos selecionados
 - verificar se existem campos no word nao presentes na tabela da DB, se sim, dar sugestao se quer adicionar esse campo à tabela existente
 
@@ -25,7 +24,7 @@ SE o método returnou falso
 
 
 
-Guardar documento na pasta origem com "_output.docx"
+Guardar documento na pasta origem com "_temp.docx"
 tirar paragrafo do documento guardar sobrepondo
 Copiar documento para pasta saida sem sobrepor File.Cpoy(sourcefile, destination, false)
 Apagar documento da pasta origem
@@ -42,14 +41,11 @@ https://www.e-iceblue.com/Tutorials/Spire.Doc/Spire.Doc-Program-Guide/Mail-Merge
 
 
 GUARDAR VARIOS DOCUMENTOS DIFERENTES de um registo FEITO
+
+Falta fazer:
 GUARDAR O MESMO DOCUMENTOS DE Vários REGISTOS
 GUARDAR VARIOS DOCUMENTOS DE VÀRIOS REGISTOS
-
-
 Depois de exportar documentos, na 2ºvez ao guardar os documentos sao inseridos os registos anteriores, nem com debug encontro o problema!!!
-
-
-TESTAR ATUALIZAR A DATAGRIVVIEW APÒS HAVER EXPORTAÇªAO
 
 
 -> CONFERIR:
