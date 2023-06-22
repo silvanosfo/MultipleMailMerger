@@ -1,53 +1,12 @@
-- preparar o/s documento/s para os vários registos selecionados
+POSSIVEIS FUNCIONALIDADES FUTURAS:
 - verificar se existem campos no word nao presentes na tabela da DB, se sim, dar sugestao se quer adicionar esse campo à tabela existente
-
-
-- MÉTODO verificar se já existe tabela com os campos compativeis
-  - CICLO que percorre as tabelas
-    - CICLO que percorre as colunas e compara com a lista de campos dos documentos
-	SE é igual
-		atribui o nome da tabela à variavel global
-		RETORNA verdadeiro
-	SENAO retorna falso
-
-//Antes de usar a variavel tabela nas querys
-//Fazer isto (já atribui o nome correto)
-SE o método returnou falso
-	- Avisar que nao existem tabelas compativeis aos documentos,
-	  e tem que se fazer uma com os campos dos documentos
-	- Inputbox para receber o nome
-	- Replace dos espaços por '_'
-	- SE nome nao está nulo nem vazio
-		Criar tabela;
-	- SENAO
-		Avisar que nao pode continuar
-
-
-
-Guardar documento na pasta origem com "_temp.docx"
-tirar paragrafo do documento guardar sobrepondo
-Copiar documento para pasta saida sem sobrepor File.Cpoy(sourcefile, destination, false)
-Apagar documento da pasta origem
-
-
-
-
-
 
 #LINKS:
 https://www.youtube.com/watch?v=dOdPf6jgtPQ
 ler, inserir, editar, apagar registos da tabela especifica a usar nos documentos
 https://www.e-iceblue.com/Tutorials/Spire.Doc/Spire.Doc-Program-Guide/Mail-Merge/Identify-Merge-Field-Names-in-Word-with-C.html
 
-
-GUARDAR VARIOS DOCUMENTOS DIFERENTES de um registo FEITO
-
 Falta fazer:
-GUARDAR O MESMO DOCUMENTOS DE Vários REGISTOS
-GUARDAR VARIOS DOCUMENTOS DE VÀRIOS REGISTOS
-Depois de exportar documentos, na 2ºvez ao guardar os documentos sao inseridos os registos anteriores, nem com debug encontro o problema!!!
-
-
--> CONFERIR:
-	- DICIONÁRIO
-	- HIERARQUIA DE PROCESSOS
+- GUARDAR O MESMO DOCUMENTOS DE Vários REGISTOS
+- GUARDAR VARIOS DOCUMENTOS DE VÀRIOS REGISTOS
+- Depois de exportar documentos, na 2ºvez ao guardar os documentos sao inseridos os registos anteriores, nem com debug encontro o problema!!!

@@ -8,6 +8,7 @@ using System.Xml.Linq;
 using Spire.Doc.Fields.Shapes;
 using word = Microsoft.Office.Interop.Word;
 using Spire.Pdf.Conversion;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace MultipleMailMerger
 {
@@ -344,12 +345,14 @@ namespace MultipleMailMerger
             if (pastaSaida.ShowDialog() == DialogResult.OK)
             {
                 word.Application wordapp = new word.Application();
-                string caminhoTemp, ext;
+                string caminhoTemp, caminhoSaida, ext;
 
                 for (int i = 0; i < listaDocumentos.Count; i++)
                 {
                     //Caminho para o local onde ficará o ficheiro .docx "temporário" populado a manipular
                     caminhoTemp = $"{Path.GetDirectoryName(caminhos[i])}\\{Path.GetFileNameWithoutExtension(caminhos[i])}_temp.docx";
+                    //Caminho para o local onde ficará o ficheiro .pdf tratado e exportado
+                    caminhoSaida = $"{pastaSaida.SelectedPath}\\{Path.GetFileNameWithoutExtension(caminhos[i])}";
 
                     listaDocumentos[i].MailMerge.Execute(listaCampos.ToArray(), conteudo.ToArray());
                     listaDocumentos[i].SaveToFile(caminhoTemp, FileFormat.Docx2019);
@@ -359,22 +362,10 @@ namespace MultipleMailMerger
                     //Esta biblioteca faz uso do MS Word do sistema em background para realizar as operações (+ lento)
                     word.Document doc = wordapp.Documents.Open(caminhoTemp);
                     doc.Paragraphs[1].Range.Delete();
-
-                    //Algoritmo para mudar o nome do ficheiro a exportar em .pdf
-                    //Em caso de já existir evita substituição/sobreposição
-                    //Tem que ser feito à mão pois não há metodos que replicam o processo do Windows usado no sistema operativo.
-                    int c = 1;
-                    string copias = "";
-                    ext = ".pdf";
-                    string caminhoSaida = $"{pastaSaida.SelectedPath}\\{Path.GetFileNameWithoutExtension(caminhos[i])}";
-                    while (File.Exists($"{caminhoSaida}{copias}{ext}"))
-                    {
-                        copias = $" ({c})";
-                        c++;
-                    }
-
-                    //Após ser encontrado um nome livre, montaámos o caminho completo.
-                    caminhoSaida = caminhoSaida + copias + ext;
+                   
+                    //Verificamos se existem documentos no local a exportar com o mesmo nome
+                    //Se existir altera o nome do ficheiro
+                    caminhoSaida = AlterarNomeFicheiroCasoExista(caminhoSaida);
 
                     //Guarda em pdf
                     doc.ExportAsFixedFormat(caminhoSaida, word.WdExportFormat.wdExportFormatPDF);
@@ -384,19 +375,54 @@ namespace MultipleMailMerger
                     //Apaga o ficheiro .docx "temporário" pois já não é mais necessário
                     File.Delete(caminhoTemp);
 
-                    //Converte o pdf em PDF/A 
+                    //Tenta converter para PDF/A
                     //Versão FREE da biblioteca Spire.PDF paga
                     //Máximo de paginas PDF 10!!!
                     //10 PÁGINAS!
-                    PdfStandardsConverter pdf_a = new PdfStandardsConverter(caminhoSaida);
-                    pdf_a.ToPdfA1B(caminhoSaida);
+                    try
+                    {
+                        PdfStandardsConverter pdf_a = new PdfStandardsConverter(caminhoSaida);
+                        pdf_a.ToPdfA1B(caminhoSaida);
 
+                    }
+                    catch (Exception)
+                    {
+                        //Caso nao der muda o nome para indicar que nao está como pdf/a
+                        //Verificação para evitar nomes iguais de ficheiros
+                        //Remove a extensao .pdf do caminho absoluto do ficheiro para poder adicionar palavra de aviso que nao é PDF/A
+                        File.Move(caminhoSaida, AlterarNomeFicheiroCasoExista(caminhoSaida.Remove(caminhoSaida.LastIndexOf('.')) + " NOT_PDF_A"));
+                    }
                 }
                 //Fecha MS Word que corre em 2º plano
                 wordapp.Quit();
 
                 MessageBox.Show("Ficheiro/s criado/s");
             }
+        }
+
+        /// <summary>
+        /// Método que recebe o caminho absoluto de um ficheiro SEM A EXTENSÃO e verifica se existe ficheiros com nomes iguais nesse local <br></br>
+        /// Se existir altera o nome do ficheiro no estilo do copiar e renomear do Windows "filename (1).ext"
+        /// </summary>
+        /// <param name="caminho"></param>
+        /// <returns>Caminho absoluto com o nome do ficheiro alterado</returns>
+        private string AlterarNomeFicheiroCasoExista(string caminho)
+        {
+            //Algoritmo para mudar o nome do ficheiro a exportar em .pdf
+            //Em caso de já existir evita substituição/sobreposição
+            //Tem que ser feito à mão pois não há metodos que replicam o processo do Windows usado no sistema operativo.
+            int c = 1;
+            string copias = "";
+            string ext = ".pdf";
+            while (File.Exists($"{caminho}{copias}{ext}"))
+            {
+                copias = $" ({c})";
+                c++;
+            }
+            //Após ser encontrado um nome livre, montámos o caminho completo.
+            caminho = caminho + copias + ext;
+
+            return caminho;
         }
 
         private void AtualizarGrid()
