@@ -10,3 +10,6 @@ Falta fazer:
 - GUARDAR O MESMO DOCUMENTOS DE Vários REGISTOS
 - GUARDAR VARIOS DOCUMENTOS DE VÀRIOS REGISTOS
 - Depois de exportar documentos, na 2ºvez ao guardar os documentos sao inseridos os registos anteriores, nem com debug encontro o problema!!!
+
+
+TESTAR NUM PC SEM .NET 6

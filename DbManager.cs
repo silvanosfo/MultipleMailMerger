@@ -10,10 +10,10 @@ namespace MultipleMailMerger
 {
     public class DbManager
     {
-        private static string pasta = "Databases";
+        private static string pasta = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\Multiple Mail Merger\\Databases";
         private static string nomeDB = "Database";
         private static string caminhoDB = $"{pasta}\\{nomeDB}.db";
-        private static string strConn = $"Data Source={pasta}\\{nomeDB}.db;Version=3";
+        private static string strConn = $"Data Source={caminhoDB};Version=3";
         public string strSQL = "";
 
         public DataTable ExecutarQuery()
