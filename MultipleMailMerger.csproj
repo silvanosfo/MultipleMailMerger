@@ -12,6 +12,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Form1 - Cópia.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <COMReference Include="Microsoft.Office.Core">
       <WrapperTool>tlbimp</WrapperTool>
       <VersionMinor>8</VersionMinor>

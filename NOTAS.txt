@@ -7,9 +7,13 @@ ler, inserir, editar, apagar registos da tabela especifica a usar nos documentos
 https://www.e-iceblue.com/Tutorials/Spire.Doc/Spire.Doc-Program-Guide/Mail-Merge/Identify-Merge-Field-Names-in-Word-with-C.html
 
 Falta fazer:
-- GUARDAR O MESMO DOCUMENTOS DE Vários REGISTOS
 - GUARDAR VARIOS DOCUMENTOS DE VÀRIOS REGISTOS
 - Depois de exportar documentos, na 2ºvez ao guardar os documentos sao inseridos os registos anteriores, nem com debug encontro o problema!!!
+https://stackoverflow.com/questions/70801882/word-mail-merge-using-c-sharp-from-access-database
+
+EXPORTAR PARA PDF/A pelo Microsoft.Office.Interop.Word:
+doc.ExportAsFixedFormat($@"{docPath2}\{InputBox}.PDF", Word.WdExportFormat.wdExportFormatPDF OpenAfterExport: true, UseISO19005_1: true);
+
 
 
 TESTAR NUM PC SEM .NET 6

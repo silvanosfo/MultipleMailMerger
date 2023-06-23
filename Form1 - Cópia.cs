@@ -9,6 +9,7 @@ using Spire.Doc.Fields.Shapes;
 using word = Microsoft.Office.Interop.Word;
 using Spire.Pdf.Conversion;
 using static System.Net.Mime.MediaTypeNames;
+using Microsoft.Office.Interop.Word;
 
 namespace MultipleMailMerger
 {
@@ -409,8 +410,8 @@ namespace MultipleMailMerger
         private static void ExecutarMailMerge(string fullPathDoc, string strQuerySQL, string fullPathSaveLoc)
         {
             object oMissing = System.Reflection.Missing.Value;
-            object fileFormat = word.WdSaveFormat.wdFormatPDF;
-            object saveChanges = word.WdSaveOptions.wdDoNotSaveChanges;
+            object fileFormat = WdSaveFormat.wdFormatPDF;
+            object saveChanges = WdSaveOptions.wdDoNotSaveChanges;
             object paramMissing = Type.Missing;
 
             word.Application wordApplication = new word.Application();
