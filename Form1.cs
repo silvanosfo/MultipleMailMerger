@@ -9,13 +9,13 @@ using Spire.Doc.Fields.Shapes;
 using word = Microsoft.Office.Interop.Word;
 using Spire.Pdf.Conversion;
 using static System.Net.Mime.MediaTypeNames;
+using System.Reflection;
 
 namespace MultipleMailMerger
 {
     public partial class Form1 : Form
     {
-        private List<string> caminhos = new List<string>();
-        private List<Document> listaDocumentos = new List<Document>();
+        private List<string> caminhosDocs = new List<string>();
         private List<string> listaCampos = new List<string>();
         public string tabela = "";
 
@@ -39,8 +39,7 @@ namespace MultipleMailMerger
         private void btnEscolherDocs_Click(object sender, EventArgs e)
         {
             //Resetar variaveis para começar processo do zero
-            caminhos.Clear();
-            listaDocumentos.Clear();
+            caminhosDocs.Clear();
             listaCampos.Clear();
             tabela = "";
 
@@ -56,16 +55,10 @@ namespace MultipleMailMerger
             //SÓ HAVENDO SUBMISSÃO É QUE CONTINUA A SEQUENCIA DO PROGRAMA
             if (janelaEscolherDocs.ShowDialog() == DialogResult.OK)
             {
-                //Captura o caminho dos ficheiros para vir a manipular posteriormente
-                //E carrega os documentos para a lista
+                //Adiciona o caminho dos ficheiros para vir a manipular posteriormente a uma lista
                 foreach (string caminho in janelaEscolherDocs.FileNames)
                 {
-                    caminhos.Add(caminho);
-
-                    Document documento = new Document();
-                    documento.LoadFromFile(caminho);
-                    listaDocumentos.Add(documento);
-                    //VALE A PENA FAZER .Dispose()? Garbage Collector?
+                    caminhosDocs.Add(caminho);
                 }
 
                 //SÓ CONTINUA SE OS DOCUMENTOS POSSUIREM CAMPOS
@@ -146,19 +139,19 @@ namespace MultipleMailMerger
         /// </returns>
         private bool VerificarExistCamposDocs()
         {
-            int quantDocs = listaDocumentos.Count();
+            int quantDocs = caminhosDocs.Count();
             int quantCampos;
             string campoAVerificar;
             for (int i = 0; i < quantDocs; i++)
             {
-                quantCampos = listaDocumentos[i].MailMerge.GetMergeFieldNames().Length;
+                quantCampos = new Document(caminhosDocs[i]).MailMerge.GetMergeFieldNames().Length;
                 if (quantCampos > 0)
                 {
                     //Percorrer todos os campos presentes no documento
                     //Adicioná-los a uma lista evitando repetições
                     for (int j = 0; j < quantCampos; j++)
                     {
-                        campoAVerificar = listaDocumentos[i].MailMerge.GetMergeFieldNames()[j];
+                        campoAVerificar = new Document(caminhosDocs[i]).MailMerge.GetMergeFieldNames()[j];
                         if (!listaCampos.Contains(campoAVerificar))
                         {
                             listaCampos.Add(campoAVerificar);
@@ -341,21 +334,27 @@ namespace MultipleMailMerger
             pastaSaida.UseDescriptionForTitle = true;
             pastaSaida.ShowNewFolderButton = true;
 
+
+
             //Executa a Janela
             if (pastaSaida.ShowDialog() == DialogResult.OK)
             {
                 word.Application wordapp = new word.Application();
                 string caminhoTemp, caminhoSaida;
 
-                for (int i = 0; i < listaDocumentos.Count; i++)
+                for (int i = 0; i < caminhosDocs.Count; i++)
                 {
                     //Caminho para o local onde ficará o ficheiro .docx "temporário" populado a manipular
-                    caminhoTemp = $"{Path.GetDirectoryName(caminhos[i])}\\{Path.GetFileNameWithoutExtension(caminhos[i])}_temp.docx";
+                    caminhoTemp = $"{Path.GetDirectoryName(caminhosDocs[i])}\\{Path.GetFileNameWithoutExtension(caminhosDocs[i])}_temp.docx";
                     //Caminho para o local onde ficará o ficheiro .pdf tratado e exportado
-                    caminhoSaida = $"{pastaSaida.SelectedPath}\\{Path.GetFileNameWithoutExtension(caminhos[i])}";
+                    caminhoSaida = $"{pastaSaida.SelectedPath}\\{Path.GetFileNameWithoutExtension(caminhosDocs[i])}";
 
-                    listaDocumentos[i].MailMerge.Execute(listaCampos.ToArray(), conteudo.ToArray());
-                    listaDocumentos[i].SaveToFile(caminhoTemp, FileFormat.Docx2019);
+                    //Instancia e carrega o documento através do caminho absoluto
+                    Document document = new Document(caminhosDocs[i]);
+
+                    //Executa o mail merge / popula os campos
+                    document.MailMerge.Execute(listaCampos.ToArray(), conteudo.ToArray());
+                    document.SaveToFile(caminhoTemp, FileFormat.Docx2019);
 
                     //Para remover a linha de usar o nuget package Spire.Doc sem licença
                     //Editamos o documento e removemos o primeiro paragrafo usando uma biblioteca do sistema
@@ -396,52 +395,9 @@ namespace MultipleMailMerger
                 //Fecha MS Word que corre em 2º plano
                 wordapp.Quit();
 
-                MessageBox.Show("Ficheiro/s criado/s");
+                MessageBox.Show("Ficheiro(s) exportado(s)");
             }
         }
-
-        /// <summary>
-        /// Método que popula os campos de um documento
-        /// </summary>
-        /// <param name="strDocument"></param>
-        /// <param name="strQuery"></param>
-        /// <param name="strSaved"></param>
-        private static void ExecutarMailMerge(string fullPathDoc, string strQuerySQL, string fullPathSaveLoc)
-        {
-            object oMissing = System.Reflection.Missing.Value;
-            object fileFormat = word.WdSaveFormat.wdFormatPDF;
-            object saveChanges = word.WdSaveOptions.wdDoNotSaveChanges;
-            object paramMissing = Type.Missing;
-
-            word.Application wordApplication = new word.Application();
-
-            word.Document document = wordApplication.Documents.Add(fullPathDoc); // Add Was Open
-            document.Activate();
-            document.MailMerge.OpenDataSource(@"LINK TO DATABASE", oMissing, false, true, true, false, oMissing, oMissing, true, oMissing, oMissing, @"dsn=DSN NAME; dbq=LINK TO ACCESS DATABASE;", strQuerySQL, oMissing, oMissing, oMissing);
-
-
-            document.MailMerge.MailAsAttachment = false;
-            document.MailMerge.MailAddressFieldName = "";
-            document.MailMerge.MailSubject = "";
-            document.MailMerge.SuppressBlankLines = true;
-            document.MailMerge.DataSource.FirstRecord = 1;
-            document.MailMerge.DataSource.LastRecord = -16;
-            document.MailMerge.Execute(true);
-            document.Activate();
-            wordApplication.ActiveDocument.SaveAs2(fullPathSaveLoc, ref fileFormat,
-                ref paramMissing, ref paramMissing, ref paramMissing, ref paramMissing,
-                ref paramMissing, ref paramMissing, ref paramMissing, ref paramMissing,
-                ref paramMissing, ref paramMissing, ref paramMissing, ref paramMissing,
-                ref paramMissing, ref paramMissing);
-
-            object doNotSaveChanges = Microsoft.Office.Interop.Word.WdSaveOptions.wdDoNotSaveChanges;
-
-            wordApplication.ActiveDocument.Close(ref doNotSaveChanges, ref oMissing, ref oMissing);
-            wordApplication.Quit(doNotSaveChanges); //This is used to quit the Word application.
-            GC.Collect(); //This is used for Garbage collection.    
-        }
-
-
 
         /// <summary>
         /// Método que recebe o caminho absoluto de um ficheiro SEM A EXTENSÃO e verifica se existe ficheiros com nomes iguais nesse local <br></br>
@@ -490,7 +446,20 @@ namespace MultipleMailMerger
                 //para permitar exportar documentos para os vários registos
                 if (dgvDados.SelectedRows.Count == 1)
                 {
-                    btnCriarDocs.Show();
+                    for (int i = 0; i < dgvDados.SelectedRows.Count; i++)
+                    {
+                        //Não deixa exportar se a linha nao estiver guardada na base de dados
+                        //Evita tambem exportar a ultima linha vazia
+                        if (string.IsNullOrEmpty(string.Format("{0}", dgvDados.SelectedRows[i].Cells[0].Value)))
+                        {
+                            btnCriarDocs.Hide();
+                        }
+                        else
+                        {
+                            btnCriarDocs.Show();
+                        }
+
+                    }
                 }
                 else
                 {
