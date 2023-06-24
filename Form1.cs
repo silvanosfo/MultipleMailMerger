@@ -340,7 +340,6 @@ namespace MultipleMailMerger
                 //atribui o caminho escolhido para saida
                 caminhoEscolhido = pastaSaida.SelectedPath;
 
-
                 //Executa processo em background
                 exportadorDocumentos.RunWorkerAsync();
             }
@@ -490,6 +489,8 @@ namespace MultipleMailMerger
             //Quando houver rows selecionadas, ativa o botao de apagar
             if (dgvDados.SelectedRows.Count > 0)
             {
+                btnApagar.Show();
+
                 for (int i = 0; i < dgvDados.SelectedRows.Count; i++)
                 {
                     //Não deixa exportar se a linha nao estiver guardada na base de dados
@@ -497,14 +498,16 @@ namespace MultipleMailMerger
                     if (string.IsNullOrEmpty(string.Format("{0}", dgvDados.SelectedRows[i].Cells[0].Value)))
                     {
                         btnCriarDocs.Hide();
+
+                        //Caso alguma das rows estiver vazia
+                        //sai do ciclo pois nao vale a pena continuar
+                        return;
                     }
                     else
                     {
                         btnCriarDocs.Show();
                     }
                 }
-
-                btnApagar.Show();
             }
             else
             {
