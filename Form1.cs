@@ -1,15 +1,8 @@
-using System.Windows.Forms;
 using Spire.Doc;
-using System;
 using Microsoft.VisualBasic;
 using System.Data;
-using static System.ComponentModel.Design.ObjectSelectorEditor;
-using System.Xml.Linq;
-using Spire.Doc.Fields.Shapes;
 using word = Microsoft.Office.Interop.Word;
 using Spire.Pdf.Conversion;
-using static System.Net.Mime.MediaTypeNames;
-using System.Reflection;
 
 namespace MultipleMailMerger
 {
@@ -316,25 +309,11 @@ namespace MultipleMailMerger
 
         private void btnCriarDocs_Click(object sender, EventArgs e)
         {
-            List<string> conteudo = new List<string>();
-            DataGridViewRow row = new DataGridViewRow();
-            row = dgvDados.CurrentRow;
-
-            foreach (DataGridViewCell cell in row.Cells)
-            {
-                conteudo.Add(string.Format("{0}", cell.Value));
-            }
-            //remove o id que vem da tabela
-            //não é usado nos campos para os documentos
-            conteudo.RemoveAt(0);
-
             //Prepara a janela para escolher pasta de said
             FolderBrowserDialog pastaSaida = new FolderBrowserDialog();
             pastaSaida.Description = "Escolha uma pasta para guardar os documentos";
             pastaSaida.UseDescriptionForTitle = true;
             pastaSaida.ShowNewFolderButton = true;
-
-
 
             //Executa a Janela
             if (pastaSaida.ShowDialog() == DialogResult.OK)
@@ -342,54 +321,71 @@ namespace MultipleMailMerger
                 word.Application wordapp = new word.Application();
                 string caminhoTemp, caminhoSaida;
 
-                for (int i = 0; i < caminhosDocs.Count; i++)
+                //Ciclo para percorrer as rows e criar os documentos para cada row selecionada
+                for (int i = 0; i < dgvDados.SelectedRows.Count; i++)
                 {
-                    //Caminho para o local onde ficará o ficheiro .docx "temporário" populado a manipular
-                    caminhoTemp = $"{Path.GetDirectoryName(caminhosDocs[i])}\\{Path.GetFileNameWithoutExtension(caminhosDocs[i])}_temp.docx";
-                    //Caminho para o local onde ficará o ficheiro .pdf tratado e exportado
-                    caminhoSaida = $"{pastaSaida.SelectedPath}\\{Path.GetFileNameWithoutExtension(caminhosDocs[i])}";
+                    List<string> conteudo = new List<string>();
+                    DataGridViewRow row = new DataGridViewRow();
+                    row = dgvDados.SelectedRows[i];
 
-                    //Instancia e carrega o documento através do caminho absoluto
-                    Document document = new Document(caminhosDocs[i]);
-
-                    //Executa o mail merge / popula os campos
-                    document.MailMerge.Execute(listaCampos.ToArray(), conteudo.ToArray());
-                    document.SaveToFile(caminhoTemp, FileFormat.Docx2019);
-
-                    //Para remover a linha de usar o nuget package Spire.Doc sem licença
-                    //Editamos o documento e removemos o primeiro paragrafo usando uma biblioteca do sistema
-                    //Esta biblioteca faz uso do MS Word do sistema em background para realizar as operações (+ lento)
-                    word.Document doc = wordapp.Documents.Open(caminhoTemp);
-                    doc.Paragraphs[1].Range.Delete();
-                   
-                    //Verificamos se existem documentos no local a exportar com o mesmo nome
-                    //Se existir altera o nome do ficheiro
-                    caminhoSaida = AlterarNomeFicheiroCasoExista(caminhoSaida);
-
-                    //Guarda em pdf
-                    doc.ExportAsFixedFormat(caminhoSaida, word.WdExportFormat.wdExportFormatPDF);
-
-                    //Fecha o documentos .docx "temporários" e guarda os conteudos
-                    doc.Close();
-                    //Apaga o ficheiro .docx "temporário" pois já não é mais necessário
-                    File.Delete(caminhoTemp);
-
-                    //Tenta converter para PDF/A
-                    //Versão FREE da biblioteca Spire.PDF paga
-                    //Máximo de paginas PDF 10!!!
-                    //10 PÁGINAS!
-                    try
+                    foreach (DataGridViewCell cell in row.Cells)
                     {
-                        PdfStandardsConverter pdf_a = new PdfStandardsConverter(caminhoSaida);
-                        pdf_a.ToPdfA1B(caminhoSaida);
-
+                        conteudo.Add(string.Format("{0}", cell.Value));
                     }
-                    catch (Exception)
+                    //remove o id que vem da tabela
+                    //não é usado nos campos para os documentos
+                    conteudo.RemoveAt(0);
+
+                    //ciclo para criar os documentos com a informação da row especifica
+                    for (int j = 0; j < caminhosDocs.Count; j++)
                     {
-                        //Caso nao der muda o nome para indicar que nao está como pdf/a
-                        //Verificação para evitar nomes iguais de ficheiros
-                        //Remove a extensao .pdf do caminho absoluto do ficheiro para poder adicionar palavra de aviso que nao é PDF/A
-                        File.Move(caminhoSaida, AlterarNomeFicheiroCasoExista(caminhoSaida.Remove(caminhoSaida.LastIndexOf('.')) + " NOT_PDF_A"));
+                        //Caminho para o local onde ficará o ficheiro .docx "temporário" populado a manipular
+                        caminhoTemp = $"{Path.GetDirectoryName(caminhosDocs[j])}\\{Path.GetFileNameWithoutExtension(caminhosDocs[j])}_temp.docx";
+                        //Caminho para o local onde ficará o ficheiro .pdf tratado e exportado
+                        caminhoSaida = $"{pastaSaida.SelectedPath}\\{Path.GetFileNameWithoutExtension(caminhosDocs[j])}";
+
+                        //Instancia e carrega o documento através do caminho absoluto
+                        Document document = new Document(caminhosDocs[j]);
+
+                        //Executa o mail merge / popula os campos
+                        document.MailMerge.Execute(listaCampos.ToArray(), conteudo.ToArray());
+                        document.SaveToFile(caminhoTemp, FileFormat.Docx2019);
+
+                        //Para remover a linha de usar o nuget package Spire.Doc sem licença
+                        //Editamos o documento e removemos o primeiro paragrafo usando uma biblioteca do sistema
+                        //Esta biblioteca faz uso do MS Word do sistema em background para realizar as operações (+ lento)
+                        word.Document doc = wordapp.Documents.Open(caminhoTemp);
+                        doc.Paragraphs[1].Range.Delete();
+                   
+                        //Verificamos se existem documentos no local a exportar com o mesmo nome
+                        //Se existir altera o nome do ficheiro
+                        caminhoSaida = AlterarNomeFicheiroCasoExista(caminhoSaida);
+
+                        //Guarda em pdf
+                        doc.ExportAsFixedFormat(caminhoSaida, word.WdExportFormat.wdExportFormatPDF);
+
+                        //Fecha o documentos .docx "temporários" e guarda os conteudos
+                        doc.Close();
+                        //Apaga o ficheiro .docx "temporário" pois já não é mais necessário
+                        File.Delete(caminhoTemp);
+
+                        //Tenta converter para PDF/A
+                        //Versão FREE da biblioteca Spire.PDF paga
+                        //Máximo de paginas PDF 10!!!
+                        //10 PÁGINAS!
+                        try
+                        {
+                            PdfStandardsConverter pdf_a = new PdfStandardsConverter(caminhoSaida);
+                            pdf_a.ToPdfA1B(caminhoSaida);
+
+                        }
+                        catch (Exception)
+                        {
+                            //Caso nao der muda o nome para indicar que nao está como pdf/a
+                            //Verificação para evitar nomes iguais de ficheiros
+                            //Remove a extensao .pdf do caminho absoluto do ficheiro para poder adicionar palavra de aviso que nao é PDF/A
+                            File.Move(caminhoSaida, AlterarNomeFicheiroCasoExista(caminhoSaida.Remove(caminhoSaida.LastIndexOf('.')) + " NOT_PDF_A"));
+                        }
                     }
                 }
                 //Fecha MS Word que corre em 2º plano
@@ -441,29 +437,18 @@ namespace MultipleMailMerger
             //Quando houver rows selecionadas, ativa o botao de apagar
             if (dgvDados.SelectedRows.Count > 0)
             {
-                //Por agora só dá para criar documentos de um registo de cada vez
-                //MUDAR ALGORITMO DE EXPORTAR DOCUMENTOS
-                //para permitar exportar documentos para os vários registos
-                if (dgvDados.SelectedRows.Count == 1)
+                for (int i = 0; i < dgvDados.SelectedRows.Count; i++)
                 {
-                    for (int i = 0; i < dgvDados.SelectedRows.Count; i++)
+                    //Não deixa exportar se a linha nao estiver guardada na base de dados
+                    //Evita tambem exportar a ultima linha vazia
+                    if (string.IsNullOrEmpty(string.Format("{0}", dgvDados.SelectedRows[i].Cells[0].Value)))
                     {
-                        //Não deixa exportar se a linha nao estiver guardada na base de dados
-                        //Evita tambem exportar a ultima linha vazia
-                        if (string.IsNullOrEmpty(string.Format("{0}", dgvDados.SelectedRows[i].Cells[0].Value)))
-                        {
-                            btnCriarDocs.Hide();
-                        }
-                        else
-                        {
-                            btnCriarDocs.Show();
-                        }
-
+                        btnCriarDocs.Hide();
                     }
-                }
-                else
-                {
-                    btnCriarDocs.Hide();
+                    else
+                    {
+                        btnCriarDocs.Show();
+                    }
                 }
 
                 btnApagar.Show();

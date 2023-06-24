@@ -1,7 +1,6 @@
 POSSIVEIS FUNCIONALIDADES FUTURAS:
 - verificar se existem campos no word nao presentes na tabela da DB, se sim, dar sugestao se quer adicionar esse campo à tabela existente
 
-Falta fazer:
-- GUARDAR VARIOS DOCUMENTOS DE VÀRIOS REGISTOS
+Por aqui algoritmo telmv
 
 TESTAR NUM PC SEM .NET 6
