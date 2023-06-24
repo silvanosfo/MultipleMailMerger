@@ -3,6 +3,11 @@ using Microsoft.VisualBasic;
 using System.Data;
 using word = Microsoft.Office.Interop.Word;
 using Spire.Pdf.Conversion;
+using System.Threading;
+using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.Reflection.Emit;
+using Spire.Pdf.Tables;
 
 namespace MultipleMailMerger
 {
@@ -11,6 +16,7 @@ namespace MultipleMailMerger
         private List<string> caminhosDocs = new List<string>();
         private List<string> listaCampos = new List<string>();
         public string tabela = "";
+        public string caminhoEscolhido = "";
 
         public Form1()
         {
@@ -27,6 +33,7 @@ namespace MultipleMailMerger
             btnGuardar.Hide();
             btnApagar.Hide();
             btnCriarDocs.Hide();
+            progBar.Visible = false;
         }
 
         private void btnEscolherDocs_Click(object sender, EventArgs e)
@@ -112,8 +119,8 @@ namespace MultipleMailMerger
         private void FormatarDGV()
         {
             //PROPRIEDADES DA DATAGRID
-            dgvDados.Columns [0].ReadOnly = true;
-            dgvDados.Columns [0].AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
+            dgvDados.Columns[0].ReadOnly = true;
+            dgvDados.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
             dgvDados.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
 
             //Não pode ordenar por colunas
@@ -318,81 +325,127 @@ namespace MultipleMailMerger
             //Executa a Janela
             if (pastaSaida.ShowDialog() == DialogResult.OK)
             {
-                word.Application wordapp = new word.Application();
-                string caminhoTemp, caminhoSaida;
+                //Mostra a barra de progresso
+                progBar.Visible = true;
 
-                //Ciclo para percorrer as rows e criar os documentos para cada row selecionada
-                for (int i = 0; i < dgvDados.SelectedRows.Count; i++)
-                {
-                    List<string> conteudo = new List<string>();
-                    DataGridViewRow row = new DataGridViewRow();
-                    row = dgvDados.SelectedRows[i];
+                //Bloqueia a interação com o from
+                //Enquanto corre o processo em background
+                btnEscolherDocs.Enabled = false;
+                btnAtualizar.Enabled = false;
+                btnGuardar.Enabled = false;
+                btnApagar.Enabled = false;
+                dgvDados.Enabled = false;
+                btnCriarDocs.Enabled = false;
 
-                    foreach (DataGridViewCell cell in row.Cells)
-                    {
-                        conteudo.Add(string.Format("{0}", cell.Value));
-                    }
-                    //remove o id que vem da tabela
-                    //não é usado nos campos para os documentos
-                    conteudo.RemoveAt(0);
+                //atribui o caminho escolhido para saida
+                caminhoEscolhido = pastaSaida.SelectedPath;
 
-                    //ciclo para criar os documentos com a informação da row especifica
-                    for (int j = 0; j < caminhosDocs.Count; j++)
-                    {
-                        //Caminho para o local onde ficará o ficheiro .docx "temporário" populado a manipular
-                        caminhoTemp = $"{Path.GetDirectoryName(caminhosDocs[j])}\\{Path.GetFileNameWithoutExtension(caminhosDocs[j])}_temp.docx";
-                        //Caminho para o local onde ficará o ficheiro .pdf tratado e exportado
-                        caminhoSaida = $"{pastaSaida.SelectedPath}\\{Path.GetFileNameWithoutExtension(caminhosDocs[j])}";
 
-                        //Instancia e carrega o documento através do caminho absoluto
-                        Document document = new Document(caminhosDocs[j]);
-
-                        //Executa o mail merge / popula os campos
-                        document.MailMerge.Execute(listaCampos.ToArray(), conteudo.ToArray());
-                        document.SaveToFile(caminhoTemp, FileFormat.Docx2019);
-
-                        //Para remover a linha de usar o nuget package Spire.Doc sem licença
-                        //Editamos o documento e removemos o primeiro paragrafo usando uma biblioteca do sistema
-                        //Esta biblioteca faz uso do MS Word do sistema em background para realizar as operações (+ lento)
-                        word.Document doc = wordapp.Documents.Open(caminhoTemp);
-                        doc.Paragraphs[1].Range.Delete();
-                   
-                        //Verificamos se existem documentos no local a exportar com o mesmo nome
-                        //Se existir altera o nome do ficheiro
-                        caminhoSaida = AlterarNomeFicheiroCasoExista(caminhoSaida);
-
-                        //Guarda em pdf
-                        doc.ExportAsFixedFormat(caminhoSaida, word.WdExportFormat.wdExportFormatPDF);
-
-                        //Fecha o documentos .docx "temporários" e guarda os conteudos
-                        doc.Close();
-                        //Apaga o ficheiro .docx "temporário" pois já não é mais necessário
-                        File.Delete(caminhoTemp);
-
-                        //Tenta converter para PDF/A
-                        //Versão FREE da biblioteca Spire.PDF paga
-                        //Máximo de paginas PDF 10!!!
-                        //10 PÁGINAS!
-                        try
-                        {
-                            PdfStandardsConverter pdf_a = new PdfStandardsConverter(caminhoSaida);
-                            pdf_a.ToPdfA1B(caminhoSaida);
-
-                        }
-                        catch (Exception)
-                        {
-                            //Caso nao der muda o nome para indicar que nao está como pdf/a
-                            //Verificação para evitar nomes iguais de ficheiros
-                            //Remove a extensao .pdf do caminho absoluto do ficheiro para poder adicionar palavra de aviso que nao é PDF/A
-                            File.Move(caminhoSaida, AlterarNomeFicheiroCasoExista(caminhoSaida.Remove(caminhoSaida.LastIndexOf('.')) + " NOT_PDF_A"));
-                        }
-                    }
-                }
-                //Fecha MS Word que corre em 2º plano
-                wordapp.Quit();
-
-                MessageBox.Show("Ficheiro(s) exportado(s)");
+                //Executa processo em background
+                exportadorDocumentos.RunWorkerAsync();
             }
+        }
+
+        private void exportadorDocumentos_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        {
+            word.Application wordapp = new word.Application();
+            string caminhoTemp, caminhoSaida;
+
+            //Algoritmo para fazer update à barra de progresso:
+            //Como nao dá para usar decimais, aumentamos o valor máximo para os milhares
+            progBar.Step = 1000 / (dgvDados.SelectedRows.Count * caminhosDocs.Count);
+
+            //Ciclo para percorrer as rows e criar os documentos para cada row selecionada
+            for (int i = 0; i < dgvDados.SelectedRows.Count; i++)
+            {
+                List<string> conteudo = new List<string>();
+                DataGridViewRow row = new DataGridViewRow();
+                row = dgvDados.SelectedRows[i];
+
+                foreach (DataGridViewCell cell in row.Cells)
+                {
+                    conteudo.Add(string.Format("{0}", cell.Value));
+                }
+                //remove o id que vem da tabela
+                //não é usado nos campos para os documentos
+                conteudo.RemoveAt(0);
+
+                //ciclo para criar os documentos com a informação da row especifica
+                for (int j = 0; j < caminhosDocs.Count; j++)
+                {
+                    //Caminho para o local onde ficará o ficheiro .docx "temporário" populado a manipular
+                    caminhoTemp = $"{Path.GetDirectoryName(caminhosDocs[j])}\\{Path.GetFileNameWithoutExtension(caminhosDocs[j])}_temp.docx";
+                    //Caminho para o local onde ficará o ficheiro .pdf tratado e exportado
+                    caminhoSaida = $"{caminhoEscolhido}\\{Path.GetFileNameWithoutExtension(caminhosDocs[j])}";
+
+                    //Instancia e carrega o documento através do caminho absoluto
+                    Document document = new Document(caminhosDocs[j]);
+
+                    //Executa o mail merge / popula os campos
+                    document.MailMerge.Execute(listaCampos.ToArray(), conteudo.ToArray());
+                    document.SaveToFile(caminhoTemp, FileFormat.Docx2019);
+
+                    //Para remover a linha de usar o nuget package Spire.Doc sem licença
+                    //Editamos o documento e removemos o primeiro paragrafo usando uma biblioteca do sistema
+                    //Esta biblioteca faz uso do MS Word do sistema em background para realizar as operações (+ lento)
+                    word.Document doc = wordapp.Documents.Open(caminhoTemp);
+                    doc.Paragraphs[1].Range.Delete();
+
+                    //Verificamos se existem documentos no local a exportar com o mesmo nome
+                    //Se existir altera o nome do ficheiro
+                    caminhoSaida = AlterarNomeFicheiroCasoExista(caminhoSaida);
+
+                    //Guarda em pdf
+                    doc.ExportAsFixedFormat(caminhoSaida, word.WdExportFormat.wdExportFormatPDF);
+
+                    //Fecha o documentos .docx "temporários" e guarda os conteudos
+                    doc.Close();
+                    //Apaga o ficheiro .docx "temporário" pois já não é mais necessário
+                    File.Delete(caminhoTemp);
+
+                    //Tenta converter para PDF/A
+                    //Versão FREE da biblioteca Spire.PDF paga
+                    //Máximo de paginas PDF 10!!!
+                    //10 PÁGINAS!
+                    try
+                    {
+                        PdfStandardsConverter pdf_a = new PdfStandardsConverter(caminhoSaida);
+                        pdf_a.ToPdfA1B(caminhoSaida);
+
+                    }
+                    catch (Exception)
+                    {
+                        //Caso nao der muda o nome para indicar que nao está como pdf/a
+                        //Verificação para evitar nomes iguais de ficheiros
+                        //Remove a extensao .pdf do caminho absoluto do ficheiro para poder adicionar palavra de aviso que nao é PDF/A
+                        File.Move(caminhoSaida, AlterarNomeFicheiroCasoExista(caminhoSaida.Remove(caminhoSaida.LastIndexOf('.')) + " NOT_PDF_A"));
+                    }
+
+                    //Incrementa barra de progresso
+                    progBar.PerformStep();
+                }
+            }
+            //Fecha MS Word que corre em 2º plano
+            wordapp.Quit();
+        }
+
+        private void exportadorDocumentos_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
+        {
+            MessageBox.Show("Ficheiro(s) exportado(s)");
+
+            // hide progress bar
+            progBar.Hide();
+
+            //Reseta a barra de progresso
+            progBar.Value = 0;
+
+            //Permite novamente a interação com o from
+            btnEscolherDocs.Enabled = true;
+            btnAtualizar.Enabled = true;
+            btnGuardar.Enabled = true;
+            btnApagar.Enabled = true;
+            dgvDados.Enabled = true;
+            btnCriarDocs.Enabled = true;
         }
 
         /// <summary>
@@ -483,6 +536,16 @@ namespace MultipleMailMerger
         private void btnCriarDocs_MouseHover(object sender, EventArgs e)
         {
             tTipDetails.Show("Exportar", btnCriarDocs);
+        }
+
+        //Não permite fechar a aplicação se o background worker estiver a trabalhar
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (exportadorDocumentos.IsBusy)
+            {
+                e.Cancel = true;
+                MessageBox.Show("Não é permitido encerrar a aplicação,\nenquanto o exportador de documentos está a trabalhar!");
+            }
         }
     }
 }
