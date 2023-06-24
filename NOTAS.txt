@@ -1,6 +1,25 @@
 POSSIVEIS FUNCIONALIDADES FUTURAS:
-- verificar se existem campos no word nao presentes na tabela da DB, se sim, dar sugestao se quer adicionar esse campo à tabela existente
+- Verificar se existem campos no word nao presentes na tabela da DB, se sim, dar sugestao se quer adicionar esse campo à tabela existente
+- Dar a volta ao limite de apenas poder exportar ficheiros com no máximo 10 págs para PDF/A usando o FreeSpire.PDF.
 
-Por aqui algoritmo telmv
+	Ideia/Algoritmo a desenvolver:
+		- ENQUANTO (documento tiver mais que 10 páginas)
+			dividir da 0 até (10 ou máximo de páginas se for menor que 10 (usar operador ternário)))
+			guardar como temp_{i}.pdf
+			converter para PDF/A
+			###continuar while até doc a manipular nao tiver mais que 10 páginas
+		- SENÃO????
+			Converter para PDF/A normalmente
+
+	ENQUANTO (Existe ficheiro _temp{i}.pdf)
+		SE (Existir _temp{i+1})
+			Unir PDF/As
+		Remover ficheiro _temp{i}.pdf
+		i++
+
+
+
+
+
 
 TESTAR NUM PC SEM .NET 6
